@@ -1,0 +1,8 @@
+services:
+  mysql:
+    image: 'mysql:latest'
+    environment:
+      - 'MYSQL_DATABASE=multimediaDB'
+      - 'MYSQL_ROOT_PASSWORD=multimedia'
+    ports:
+      - '3306'

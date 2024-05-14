@@ -1,0 +1,69 @@
+package com.example.multimediaapi.model;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class User implements UserDetails {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String username;
+    @Column(unique = true)
+    private String email;
+    private String password;
+    private String userRole;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_at",
+            nullable = false, updatable = false,
+            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @CreatedDate
+    private Date createdAt;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        if (this.userRole.equals("ADMIN")) {
+            authorities.add(new SimpleGrantedAuthority("ADMIN"));
+        } else if (this.userRole.equals("MANAGER")) {
+            authorities.add(new SimpleGrantedAuthority("MANAGER"));
+        } else if (this.userRole.equals("CLIENT")) {
+            authorities.add(new SimpleGrantedAuthority("CLIENT"));
+        }
+        return authorities;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+}
