@@ -22,7 +22,8 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String username;
+    private String name;
+    private String surname;
     @Column(unique = true)
     private String email;
     private String password;
@@ -31,8 +32,14 @@ public class User implements UserDetails {
     @Column(name = "created_at",
             nullable = false, updatable = false,
             columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    @CreatedDate
     private Date createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        if (createdAt == null) {
+            createdAt = new Date();
+        }
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -45,6 +52,11 @@ public class User implements UserDetails {
             authorities.add(new SimpleGrantedAuthority("CLIENT"));
         }
         return authorities;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
     }
 
     @Override
