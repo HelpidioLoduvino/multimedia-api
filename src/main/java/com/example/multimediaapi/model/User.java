@@ -28,6 +28,7 @@ public class User implements UserDetails {
     private String email;
     private String password;
     private String userRole;
+    private boolean editor;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at",
             nullable = false, updatable = false,

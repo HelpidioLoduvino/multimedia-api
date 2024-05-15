@@ -1,12 +1,11 @@
 package com.example.multimediaapi.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Data
@@ -17,8 +16,20 @@ public class Music {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
-    private String artist;
-    private String album;
+    @ManyToMany
+    @JoinTable(
+            name = "music_artist",
+            joinColumns = @JoinColumn(name = "music_id"),
+            inverseJoinColumns = @JoinColumn(name = "artist_id")
+    )
+    private List<Artist> artists;
+    @ManyToOne
+    @JoinColumn(name = "album_id")
+    private Album album;
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "lyric_id")
+    private Lyric lyric;
     private String genre;
+    private String songwriter;
     private String path;
 }
