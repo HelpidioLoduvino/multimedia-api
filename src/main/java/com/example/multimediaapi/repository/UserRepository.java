@@ -18,6 +18,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("select new com.example.multimediaapi.dto.UserDTO(u.id, u.name, u.surname, u.email, u.userRole, u.editor, u.createdAt) from User u")
     List<UserDTO> findAllUsers();
 
-    @Query("select new com.example.multimediaapi.dto.UserDTO(u.id, u.name, u.surname, u.email, u.userRole, u.editor, u.createdAt) from User u where u.email = :email")
-    Optional<UserDTO> findUserByEmail(String email);
+    @Query("select new com.example.multimediaapi.model.User(u.id, u.name, u.surname, u.email, u.password, u.userRole, u.editor, u.createdAt) from User u where u.email = :email")
+    User findByUserEmail(String email);
 }

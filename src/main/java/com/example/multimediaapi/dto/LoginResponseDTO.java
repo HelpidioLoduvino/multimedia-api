@@ -1,4 +1,4 @@
 package com.example.multimediaapi.dto;
 
-public record LoginResponseDTO(String token, String email, String userRole) {
+public record LoginResponseDTO(Long id, String token, String email, String userRole) {
 }

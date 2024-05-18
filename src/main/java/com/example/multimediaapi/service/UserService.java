@@ -58,7 +58,8 @@ public class UserService implements UserDetailsService {
         var token = tokenService.generateToken((User) authentication.getPrincipal());
         String userRole = user.getAuthorities().iterator().next().getAuthority();
         String email = user.getEmail();
-        return ResponseEntity.ok(new LoginResponseDTO(token, userRole, email));
+        Long id = user.getId();
+        return ResponseEntity.ok(new LoginResponseDTO(id, token, userRole, email));
     }
 
     public List<UserDTO> getAllUsers() {
@@ -70,8 +71,4 @@ public class UserService implements UserDetailsService {
         return ResponseEntity.ok().build();
     }
 
-    public ResponseEntity<Object> findUserByEmail(String email) {
-        Optional<UserDTO> user = userRepository.findUserByEmail(email);
-        return ResponseEntity.ok(user);
-    }
 }

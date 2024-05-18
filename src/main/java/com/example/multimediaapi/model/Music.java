@@ -15,7 +15,9 @@ public class Music {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String title;
+
     @ManyToMany
     @JoinTable(
             name = "music_artist",
@@ -23,13 +25,21 @@ public class Music {
             inverseJoinColumns = @JoinColumn(name = "artist_id")
     )
     private List<Artist> artists;
+
     @ManyToOne
     @JoinColumn(name = "album_id")
     private Album album;
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "lyric_id")
-    private Lyric lyric;
-    private String genre;
-    private String songwriter;
+
+    @ManyToOne
+    private Category genre;
+
+    @ManyToMany
+    @JoinTable(
+            name = "music_songwriter",
+            joinColumns = @JoinColumn(name = "music_id"),
+            inverseJoinColumns = @JoinColumn(name = "songwriter_id")
+    )
+    private List<SongWriter> songwriter;
+
     private String path;
 }
