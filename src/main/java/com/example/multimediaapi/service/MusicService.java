@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 public class MusicService {
 
     private final String uploadDir = "src/main/resources/uploads/music/";
+    private final UserRepository userRepository;
     private final MusicRepository musicRepository;
     private final AlbumRepository albumRepository;
     private final ArtistRepository artistRepository;
@@ -34,6 +35,13 @@ public class MusicService {
     public ResponseEntity<Object> uploadMusic(Music music, MultipartFile file) {
 
         try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
+            Object principal = auth.getPrincipal();
+            String email = ((UserDetails) principal).getUsername();
+
+            User user = userRepository.findByUserEmail(email);
+
             String fileName = generateUniqueFileName(file.getOriginalFilename());
             saveFile(file, fileName);
             music.setTitle(music.getTitle());
@@ -72,6 +80,7 @@ public class MusicService {
                     })
                     .collect(Collectors.toList());
 
+            music.setUser(user);
             music.setPath(uploadDir + fileName);
             music.setAlbum(album);
             music.setGenre(genre);

@@ -18,6 +18,10 @@ public class Music {
 
     private String title;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
     @ManyToMany
     @JoinTable(
             name = "music_artist",
