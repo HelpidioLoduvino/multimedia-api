@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class MusicService {
 
-    private final String uploadDir = "src/main/resources/uploads/music/";
+    private final String uploadDir = "src/main/resources/static/music/";
     private final UserRepository userRepository;
     private final MusicRepository musicRepository;
     private final AlbumRepository albumRepository;
@@ -97,6 +97,10 @@ public class MusicService {
 
     public List<Music> getAll() {
         return musicRepository.findAll();
+    }
+
+    public void delete(Long id) {
+        musicRepository.deleteById(id);
     }
 
     private String generateUniqueFileName(String originalFilename) {

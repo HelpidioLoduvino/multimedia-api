@@ -12,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/musics")
+@CrossOrigin(origins = "http://localhost:4200")
 @AllArgsConstructor
 public class MusicController {
     private final MusicService musicService;
@@ -24,5 +25,11 @@ public class MusicController {
     @GetMapping("/all")
     public ResponseEntity<List<Music>> getAll() {
         return ResponseEntity.ok(musicService.getAll());
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Object> delete(@PathVariable Long id) {
+        musicService.delete(id);
+        return ResponseEntity.ok().build();
     }
 }
