@@ -2,8 +2,13 @@ package com.example.multimediaapi.service;
 
 import com.example.multimediaapi.model.*;
 import com.example.multimediaapi.repository.*;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import lombok.AllArgsConstructor;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,8 +16,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -97,6 +102,25 @@ public class MusicService {
 
     public List<Music> getAll() {
         return musicRepository.findAll();
+    }
+
+    public ResponseEntity<InputStreamResource> playMusic(Long id) throws IOException {
+        Music music = musicRepository.findById(id).orElse(null);
+        if (music != null) {
+            Path path = Paths.get(music.getPath());
+            BufferedInputStream fileStream = new BufferedInputStream(new FileInputStream(path.toFile()));
+            InputStreamResource resource = new InputStreamResource(fileStream);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Content-Disposition", "attachment; filename=\"" + path.getFileName().toString() + "\"");
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(path.toFile().length())
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(resource);
+        }
+        return ResponseEntity.notFound().build();
     }
 
     public void delete(Long id) {
