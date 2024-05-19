@@ -45,7 +45,7 @@ public class UserService implements UserDetailsService {
     public ResponseEntity<Object> registerUser(@RequestBody User user) {
         if(this.userRepository.findByEmail(user.getEmail()) != null) return ResponseEntity.badRequest().build();
         String encryptedPassword = passwordEncoder.encode(user.getPassword());
-        User newUser = new User(null, user.getName(), user.getSurname(), user.getEmail(), encryptedPassword, user.getUserRole(), user.isEditor(), null);
+        User newUser = new User(null, user.getName(), user.getSurname(), user.getEmail(), encryptedPassword, user.getUserRole(), null);
         userRepository.save(newUser);
         return ResponseEntity.ok(newUser);
     }
