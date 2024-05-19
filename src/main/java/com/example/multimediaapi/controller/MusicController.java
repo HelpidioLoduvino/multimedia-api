@@ -29,6 +29,11 @@ public class MusicController {
         return ResponseEntity.ok(musicService.getAll());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Music> getMusicById(@PathVariable Long id) {
+        return ResponseEntity.ok(musicService.getMusic(id));
+    }
+
     @GetMapping("/play/{id}")
     public ResponseEntity<InputStreamResource> play(@PathVariable Long id) throws IOException {
         ResponseEntity<InputStreamResource> music = musicService.playMusic(id);

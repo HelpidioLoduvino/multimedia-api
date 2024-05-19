@@ -3,16 +3,17 @@ package com.example.multimediaapi.controller;
 import com.example.multimediaapi.dto.LoginDTO;
 import com.example.multimediaapi.model.User;
 import com.example.multimediaapi.service.UserService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/user")
+@AllArgsConstructor()
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     @PostMapping("/register")
     public ResponseEntity<Object> register(@RequestBody User user) {
@@ -27,6 +28,11 @@ public class UserController {
     @GetMapping("/all")
     public ResponseEntity<Object> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
+    }
+
+    @GetMapping("/clients")
+    public ResponseEntity<Object> getClients() {
+        return ResponseEntity.ok(userService.getUsersByRoleClient());
     }
 
     @DeleteMapping("/delete/{id}")

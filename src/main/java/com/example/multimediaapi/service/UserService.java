@@ -6,6 +6,7 @@ import com.example.multimediaapi.dto.UserDTO;
 import com.example.multimediaapi.model.User;
 import com.example.multimediaapi.repository.UserRepository;
 import com.example.multimediaapi.security.TokenService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.ResponseEntity;
@@ -23,18 +24,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class UserService implements UserDetailsService {
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    PasswordEncoder passwordEncoder;
-
-    @Autowired
-    ApplicationContext applicationContext;
-    @Autowired
-    private TokenService tokenService;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final ApplicationContext applicationContext;
+    private final TokenService tokenService;
 
 
     @Override
@@ -64,6 +60,10 @@ public class UserService implements UserDetailsService {
 
     public List<UserDTO> getAllUsers() {
         return userRepository.findAllUsers();
+    }
+
+    public List<UserDTO> getUsersByRoleClient() {
+        return userRepository.findAllUsersByRoleClient();
     }
 
     public ResponseEntity<Object> deleteUser(Long id) {

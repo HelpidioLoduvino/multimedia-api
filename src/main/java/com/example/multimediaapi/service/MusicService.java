@@ -104,6 +104,10 @@ public class MusicService {
         return musicRepository.findAll();
     }
 
+    public Music getMusic(Long id){
+        return musicRepository.findById(id).orElse(null);
+    }
+
     public ResponseEntity<InputStreamResource> playMusic(Long id) throws IOException {
         Music music = musicRepository.findById(id).orElse(null);
         if (music != null) {
