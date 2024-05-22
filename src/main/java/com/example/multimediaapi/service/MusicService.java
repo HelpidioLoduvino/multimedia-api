@@ -142,6 +142,7 @@ public class MusicService {
             newMusic.setSongwriters(songWriters);
             newMusic.setLyric(musicDto.music().getLyric());
             musicRepository.save(newMusic);
+
             return ResponseEntity.ok(newMusic);
         }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error while uploading music: " + e.getMessage());
