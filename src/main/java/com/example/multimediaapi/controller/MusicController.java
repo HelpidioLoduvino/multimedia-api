@@ -1,5 +1,6 @@
 package com.example.multimediaapi.controller;
 
+import com.example.multimediaapi.dto.MusicDto;
 import com.example.multimediaapi.model.Music;
 import com.example.multimediaapi.service.MusicService;
 import lombok.AllArgsConstructor;
@@ -20,8 +21,8 @@ public class MusicController {
     private final MusicService musicService;
 
     @PostMapping("/upload")
-    public ResponseEntity<Object> upload(@RequestPart("music") Music music, @RequestPart("file") MultipartFile file) throws IOException {
-        return ResponseEntity.ok(musicService.uploadMusic(music, file));
+    public ResponseEntity<Object> upload(@RequestBody MusicDto musicDto, @RequestPart("music") MultipartFile musicFile, @RequestPart("image") MultipartFile imgFile) throws IOException {
+        return  ResponseEntity.ok(musicService.uploadMusic(musicDto, musicFile, imgFile));
     }
 
     @GetMapping("/all")

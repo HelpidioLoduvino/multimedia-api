@@ -27,12 +27,23 @@ public class User implements UserDetails {
     @Column(unique = true)
     private String email;
     private String password;
+    private String confirmPassword;
     private String userRole;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at",
             nullable = false, updatable = false,
             columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date createdAt;
+
+    public User(Long id, String name, String surname, String email, String encodedPassword, String userRole, Date createdAt) {
+        this.id = id;
+        this.name = name;
+        this.surname = surname;
+        this.email = email;
+        this.password = encodedPassword;
+        this.userRole = userRole;
+        this.createdAt = createdAt;
+    }
 
     @PrePersist
     protected void onCreate() {

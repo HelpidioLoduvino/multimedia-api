@@ -11,8 +11,16 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SongWriter extends Artist{
+public class Author extends Artist{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "label_id")
+    private Label label;
+
+    @ManyToOne
+    @JoinColumn(name = "band_id")
+    private Band band;
 }

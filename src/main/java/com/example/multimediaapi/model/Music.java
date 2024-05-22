@@ -3,39 +3,52 @@ package com.example.multimediaapi.model;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Music {
+public class Music extends Content{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String title;
+    private String cover;
+
+    private String lyric;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
+    @ManyToOne
+    @JoinColumn(name = "genre_id")
+    private Category genre;
+
+    @ManyToOne
+    @JoinColumn(name = "music_release_id")
+    private MusicRelease musicRelease;
+
     @ManyToMany
     @JoinTable(
-            name = "music_artist",
+            name = "music_author",
             joinColumns = @JoinColumn(name = "music_id"),
-            inverseJoinColumns = @JoinColumn(name = "artist_id")
+            inverseJoinColumns = @JoinColumn(name = "author_id")
     )
-    private List<Artist> artists;
+    private List<Author> authors;
 
-    @ManyToOne
-    @JoinColumn(name = "album_id")
-    private Album album;
-
-    @ManyToOne
-    private Category genre;
+    @ManyToMany
+    @JoinTable(
+            name = "music_feature",
+            joinColumns = @JoinColumn(name = "music_id"),
+            inverseJoinColumns = @JoinColumn(name = "feature_id ")
+    )
+    private List<Feature> features;
 
     @ManyToMany
     @JoinTable(
@@ -43,7 +56,5 @@ public class Music {
             joinColumns = @JoinColumn(name = "music_id"),
             inverseJoinColumns = @JoinColumn(name = "songwriter_id")
     )
-    private List<SongWriter> songwriter;
-
-    private String path;
+    private List<SongWriter> songwriters;
 }

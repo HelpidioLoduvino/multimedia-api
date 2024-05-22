@@ -1,14 +1,14 @@
 package com.example.multimediaapi.service;
 
-import com.example.multimediaapi.dto.LoginDTO;
-import com.example.multimediaapi.dto.LoginResponseDTO;
-import com.example.multimediaapi.dto.UserDTO;
+import com.example.multimediaapi.dto.LoginDto;
+import com.example.multimediaapi.dto.LoginResponseDto;
+import com.example.multimediaapi.dto.UserDto;
 import com.example.multimediaapi.model.User;
 import com.example.multimediaapi.repository.UserRepository;
 import com.example.multimediaapi.security.TokenService;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -39,30 +38,46 @@ public class UserService implements UserDetailsService {
     }
 
     public ResponseEntity<Object> registerUser(@RequestBody User user) {
-        if(this.userRepository.findByEmail(user.getEmail()) != null) return ResponseEntity.badRequest().build();
-        String encryptedPassword = passwordEncoder.encode(user.getPassword());
-        User newUser = new User(null, user.getName(), user.getSurname(), user.getEmail(), encryptedPassword, user.getUserRole(), null);
-        userRepository.save(newUser);
-        return ResponseEntity.ok(newUser);
+        try {
+            if(this.userRepository.findByEmail(user.getEmail()) != null) return ResponseEntity.badRequest().build();
+
+            if(!user.getPassword().equals(user.getConfirmPassword())){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Passwords do not match");
+            }
+
+            String encodedPassword = passwordEncoder.encode(user.getPassword());
+
+            User newUser = new User(null, user.getName(), user.getSurname(), user.getEmail(), encodedPassword, user.getUserRole(), null);
+
+            userRepository.save(newUser);
+
+            return ResponseEntity.ok(newUser);
+
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred during registration");
+        }
+
     }
 
-    public ResponseEntity<Object> login(@RequestBody LoginDTO loginDTO){
+    public ResponseEntity<Object> login(@RequestBody LoginDto loginDTO){
         AuthenticationManager authenticationManager = applicationContext.getBean(AuthenticationManager.class);
         var emailPassword = new UsernamePasswordAuthenticationToken(loginDTO.email(), loginDTO.password());
         Authentication authentication = authenticationManager.authenticate(emailPassword);
         User user = (User) authentication.getPrincipal();
         var token = tokenService.generateToken((User) authentication.getPrincipal());
-        String userRole = user.getAuthorities().iterator().next().getAuthority();
         String email = user.getEmail();
+        String userRole = user.getAuthorities().iterator().next().getAuthority();
         Long id = user.getId();
-        return ResponseEntity.ok(new LoginResponseDTO(id, token, userRole, email));
+        return ResponseEntity.ok(new LoginResponseDto(id, token, email, userRole));
     }
 
-    public List<UserDTO> getAllUsers() {
+    public List<UserDto> getAllUsers() {
         return userRepository.findAllUsers();
     }
 
-    public List<UserDTO> getUsersByRoleClient() {
+    public List<UserDto> getUsersByRoleClient() {
         return userRepository.findAllUsersByRoleClient();
     }
 

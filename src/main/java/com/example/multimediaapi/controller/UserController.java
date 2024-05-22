@@ -1,10 +1,9 @@
 package com.example.multimediaapi.controller;
 
-import com.example.multimediaapi.dto.LoginDTO;
+import com.example.multimediaapi.dto.LoginDto;
 import com.example.multimediaapi.model.User;
 import com.example.multimediaapi.service.UserService;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +20,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Object> login(@RequestBody LoginDTO user) {
+    public ResponseEntity<Object> login(@RequestBody LoginDto user) {
         return userService.login(user);
     }
 
