@@ -1,6 +1,5 @@
 package com.example.multimediaapi.controller;
 
-import com.example.multimediaapi.model.Album;
 import com.example.multimediaapi.model.AlbumReview;
 import com.example.multimediaapi.service.AlbumService;
 import lombok.AllArgsConstructor;
@@ -13,6 +12,7 @@ import java.util.List;
 @RequestMapping("/albums")
 @AllArgsConstructor
 public class AlbumController {
+    /*
     private AlbumService albumService;
 
     @GetMapping("/all")
@@ -30,4 +30,6 @@ public class AlbumController {
     public ResponseEntity<List<AlbumReview>> getById(@PathVariable Long id) {
         return ResponseEntity.ok(albumService.getAlbumReview(id));
     }
+
+     */
 }

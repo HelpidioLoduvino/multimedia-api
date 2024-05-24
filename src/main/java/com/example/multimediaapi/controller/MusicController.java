@@ -21,8 +21,8 @@ public class MusicController {
     private final MusicService musicService;
 
     @PostMapping("/upload")
-    public ResponseEntity<Object> upload(@RequestBody MusicDto musicDto, @RequestPart("music") MultipartFile musicFile, @RequestPart("image") MultipartFile imgFile) throws IOException {
-        return  ResponseEntity.ok(musicService.uploadMusic(musicDto, musicFile, imgFile));
+    public ResponseEntity<Object> upload(@RequestPart("music") Music music, @RequestPart("musicFile") MultipartFile musicFile, @RequestPart("imageFile") MultipartFile imgFile) throws IOException {
+        return  ResponseEntity.ok(musicService.uploadMusic(music, musicFile, imgFile));
     }
 
     @GetMapping("/all")

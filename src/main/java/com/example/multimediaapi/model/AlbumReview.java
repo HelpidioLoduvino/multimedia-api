@@ -23,6 +23,6 @@ public class AlbumReview {
 
     @ManyToOne
     @JoinColumn(name = "album_id")
-    private Album album;
+    private MusicRelease musicRelease;
 
 }

@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface BandRepository extends JpaRepository<Band, Long> {
-    Optional<Band> findByName(String name);
+    Optional<Band> findByBandName(String name);
 }

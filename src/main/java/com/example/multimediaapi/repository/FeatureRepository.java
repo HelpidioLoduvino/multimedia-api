@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 public interface FeatureRepository extends JpaRepository<Feature, Long> {
 
-    Optional<Feature> findByName(String name);
+    Optional<Feature> findByArtistName(String name);
 }

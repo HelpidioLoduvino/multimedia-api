@@ -32,18 +32,16 @@ public class MusicService {
     private final String uploadImgDir = "src/main/resources/static/cover/";
     private final UserRepository userRepository;
     private final MusicRepository musicRepository;
-    private final AlbumRepository albumRepository;
     private final AuthorRepository authorRepository;
     private final CategoryRepository categoryRepository;
     private final SongWriterRepository songWriterRepository;
     private final MusicReleaseRepository musicReleaseRepository;
-    private final SingleRepository singleRepository;
     private final LabelRepository labelRepository;
     private final BandRepository bandRepository;
     private final FeatureRepository featureRepository;
 
     @Transactional(rollbackFor = Exception.class)
-    public ResponseEntity<Object> uploadMusic(MusicDto musicDto, MultipartFile musicFile, MultipartFile imageFile) {
+    public ResponseEntity<Object> uploadMusic(Music music, MultipartFile musicFile, MultipartFile imageFile) {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
@@ -54,75 +52,79 @@ public class MusicService {
 
             String musicFileName = generateUniqueFileName(musicFile.getOriginalFilename());
             String imageFileName = generateUniqueFileName(imageFile.getOriginalFilename());
-            saveFile(musicFile, musicFileName);
-            saveFile(imageFile, imageFileName);
+            saveMusicFile(musicFile, musicFileName);
+            saveImgFile(imageFile, imageFileName);
 
-            Category genre = categoryRepository.findByName(musicDto.music().getGenre().getName())
-                    .orElseGet(() -> new Category(null, musicDto.music().getGenre().getName()));
-
-            MusicRelease musicRelease = musicReleaseRepository.findByName(musicDto.musicRelease().getName())
+            Category genre = categoryRepository.findByName(music.getGenre().getName())
                     .orElseGet(() -> {
-
-                        if(musicDto.musicRelease().getType().equalsIgnoreCase("Album")){
-                            Album newAlbum = new Album();
-                            newAlbum.setName(musicDto.musicRelease().getName());
-                            albumRepository.save(newAlbum);
-                            return newAlbum;
-                        } else if(musicDto.musicRelease().getType().equalsIgnoreCase("Single")){
-                            Single newSingle = new Single();
-                            newSingle.setName(musicDto.musicRelease().getName());
-                            singleRepository.save(newSingle);
-                            return newSingle;
-                        }
-                        throw new IllegalArgumentException("Unknown music release type: " + musicDto.musicRelease().getType());
+                        Category category = new Category();
+                        category.setName(music.getGenre().getName());
+                        category = categoryRepository.save(category);
+                        return category;
                     });
 
-            List<Author> authors = musicDto.music().getAuthors().stream()
-                    .map(authorDto -> {
-                        Author newAuthor = authorRepository.findByName(authorDto.getName()).orElse(null);
-                        if(newAuthor == null){
-                            newAuthor = new Author();
-                            newAuthor.setName(authorDto.getName());
-                            Label label = labelRepository.findByName(authorDto.getLabel().getName()).orElse(null);
-                            if(label == null){
-                                label = new Label();
-                                label.setName(authorDto.getLabel().getName());
-                                label = labelRepository.save(label);
-                            }
-                            Band band = bandRepository.findByName(authorDto.getBand().getName()).orElse(null);
-                            if(band == null){
-                                band = new Band();
-                                band.setName(authorDto.getBand().getName());
-                                band.setHistory(authorDto.getBand().getHistory());
-                                band.setStart(authorDto.getBand().getStart());
-                                band.setEnd(authorDto.getBand().getEnd());
-                                band = bandRepository.save(band);
-                            }
+            MusicRelease musicRelease = musicReleaseRepository.findByMusicReleaseName(music.getMusicRelease().getMusicReleaseName())
+                    .orElseGet(() -> {
+                        MusicRelease newRelease = new MusicRelease();
+                        newRelease.setMusicReleaseName(music.getMusicRelease().getMusicReleaseName());
+                        newRelease.setMusicReleaseDescription(music.getMusicRelease().getMusicReleaseDescription());
+                        newRelease.setReleaseType(music.getMusicRelease().getReleaseType());
+                        newRelease.setReleaseDate(music.getMusicRelease().getReleaseDate());
+                        newRelease.setCover(uploadImgDir + imageFileName);
+                        newRelease = musicReleaseRepository.save(newRelease);
+                        return newRelease;
+                    });
 
-                            newAuthor.setLabel(label);
-                            newAuthor.setBand(band);
-                            newAuthor = authorRepository.save(newAuthor);
+            Author author = authorRepository.findByArtistName(music.getAuthor().getArtistName())
+                    .orElseGet(() -> {
+                        Author newAuthor = new Author();
+                        Label label = labelRepository.findByLabelName(music.getAuthor().getLabel().getLabelName()).orElse(null);
+                        if(label == null) {
+                             label = new Label();
+                             label.setLabelName(music.getAuthor().getLabel().getLabelName());
+                             label = labelRepository.save(label);
                         }
+                        Band band = null;
+                        if (music.getAuthor().getBand() != null) {
+                            band = bandRepository.findByBandName(music.getAuthor().getBand().getBandName()).orElse(null);
+                            if (band == null) {
+                                band = new Band();
+                                band.setBandName(music.getAuthor().getBand().getBandName());
+                                band.setHistory(music.getAuthor().getBand().getHistory());
+                                band.setStart(music.getAuthor().getBand().getStart());
+                                band.setEnd(music.getAuthor().getBand().getEnd());
+                                band = bandRepository.save(band);
+                            } else {
+                                if (music.getAuthor().getBand().getEnd() != null) {
+                                    band.setEnd(music.getAuthor().getBand().getEnd());
+                                    band = bandRepository.save(band);
+                                }
+                            }
+                        }
+                        newAuthor.setArtistName(music.getAuthor().getArtistName());
+                        newAuthor.setLabel(label);
+                        newAuthor.setBand(band);
+                        newAuthor = authorRepository.save(newAuthor);
                         return newAuthor;
-                    }).collect(Collectors.toList());
+                    });
 
-            List<Feature> features = musicDto.music().getFeatures().stream()
+            List<Feature> features = music.getFeatures().stream()
                     .map(featureDto -> {
-                        Feature newFeature = featureRepository.findByName(featureDto.getName()).orElse(null);
+                        Feature newFeature = featureRepository.findByArtistName(featureDto.getArtistName()).orElse(null);
                         if(newFeature == null){
                             newFeature = new Feature();
-                            newFeature.setName(featureDto.getName());
+                            newFeature.setArtistName(featureDto.getArtistName());
                             newFeature = featureRepository.save(newFeature);
                         }
                         return newFeature;
                     }).collect(Collectors.toList());
 
-            List<SongWriter> songWriters = musicDto.music().getSongwriters().stream()
+            List<SongWriter> songWriters = music.getSongwriters().stream()
                     .map(songWriterDto -> {
-                        SongWriter songWriter = songWriterRepository.findByName(songWriterDto.getName()).orElse(null);
+                        SongWriter songWriter = songWriterRepository.findByArtistName(songWriterDto.getArtistName()).orElse(null);
                         if (songWriter == null){
                             songWriter = new SongWriter();
-                            songWriter.setName(songWriterDto.getName());
+                            songWriter.setArtistName(songWriterDto.getArtistName());
                             songWriter = songWriterRepository.save(songWriter);
                         }
                         return songWriter;
@@ -130,17 +132,15 @@ public class MusicService {
 
 
             Music newMusic = new Music();
-            newMusic.setTitle(musicDto.music().getTitle());
-            newMusic.setDescription(musicDto.music().getDescription());
-            newMusic.setCover(uploadImgDir + imageFileName);
+            newMusic.setTitle(music.getTitle());
             newMusic.setPath(uploadDir + musicFileName);
             newMusic.setUser(user);
             newMusic.setMusicRelease(musicRelease);
             newMusic.setGenre(genre);
-            newMusic.setAuthors(authors);
+            newMusic.setAuthor(author);
             newMusic.setFeatures(features);
             newMusic.setSongwriters(songWriters);
-            newMusic.setLyric(musicDto.music().getLyric());
+            newMusic.setLyric(music.getLyric());
             musicRepository.save(newMusic);
 
             return ResponseEntity.ok(newMusic);
@@ -181,10 +181,10 @@ public class MusicService {
     }
 
     private String generateUniqueFileName(String originalFilename) {
-        return UUID.randomUUID().toString() + "_" + originalFilename;
+        return UUID.randomUUID() + "_" + originalFilename;
     }
 
-    private void saveFile(MultipartFile file, String fileName) throws IOException {
+    private void saveMusicFile(MultipartFile file, String fileName) throws IOException {
 
         File directory = new File(uploadDir);
         if (!directory.exists()) {
@@ -192,6 +192,17 @@ public class MusicService {
         }
 
         Path filePath = Paths.get(uploadDir + fileName);
+        Files.write(filePath, file.getBytes());
+    }
+
+    private void saveImgFile(MultipartFile file, String fileName) throws IOException {
+
+        File directory = new File(uploadImgDir);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        Path filePath = Paths.get(uploadImgDir + fileName);
         Files.write(filePath, file.getBytes());
     }
 

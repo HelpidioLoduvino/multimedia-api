@@ -18,8 +18,7 @@ public class Music extends Content{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String cover;
-
+    @Column(columnDefinition = "LONGTEXT")
     private String lyric;
 
     @ManyToOne
@@ -34,13 +33,9 @@ public class Music extends Content{
     @JoinColumn(name = "music_release_id")
     private MusicRelease musicRelease;
 
-    @ManyToMany
-    @JoinTable(
-            name = "music_author",
-            joinColumns = @JoinColumn(name = "music_id"),
-            inverseJoinColumns = @JoinColumn(name = "author_id")
-    )
-    private List<Author> authors;
+    @ManyToOne
+    @JoinColumn(name = "author_id")
+    private Author author;
 
     @ManyToMany
     @JoinTable(

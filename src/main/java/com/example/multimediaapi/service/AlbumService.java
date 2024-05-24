@@ -1,8 +1,6 @@
 package com.example.multimediaapi.service;
 
-import com.example.multimediaapi.model.Album;
 import com.example.multimediaapi.model.AlbumReview;
-import com.example.multimediaapi.repository.AlbumRepository;
 import com.example.multimediaapi.repository.AlbumReviewRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,7 +10,8 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class AlbumService {
-    private AlbumRepository albumRepository;
+
+    /*
     private AlbumReviewRepository albumReviewRepository;
 
     public List<Album> getAll() {
@@ -33,4 +32,6 @@ public class AlbumService {
     }
 
 
+
+     */
 }

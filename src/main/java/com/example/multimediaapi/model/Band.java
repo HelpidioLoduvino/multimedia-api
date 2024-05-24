@@ -1,9 +1,6 @@
 package com.example.multimediaapi.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,8 +15,9 @@ public class Band {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
+    private String bandName;
+    @Column(columnDefinition = "LONGTEXT")
     private String history;
-    private Date start;
-    private Date end;
+    private Integer start;
+    private Integer end;
 }
