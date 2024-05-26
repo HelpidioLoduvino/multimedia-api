@@ -34,21 +34,10 @@ public class MusicController {
         return ResponseEntity.ok(musicService.getAll());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Music> getMusicById(@PathVariable Long id) {
-        return ResponseEntity.ok(musicService.getMusic(id));
-    }
-
-    @GetMapping("/play/{id}")
-    public ResponseEntity<InputStreamResource> play(@PathVariable Long id) throws IOException {
-        ResponseEntity<InputStreamResource> music = musicService.playMusic(id);
-        return ResponseEntity.ok(music.getBody());
-    }
-
-    @GetMapping("/display/{id}")
-    public ResponseEntity<Resource> displayImage(@PathVariable Long id){
-        ResponseEntity<Resource> image = musicService.displayImage(id);
-        return ResponseEntity.ok(image.getBody());
+    @GetMapping("/cover/{id}")
+    public ResponseEntity<Resource> displayMusicCover(@PathVariable Long id) {
+        ResponseEntity<Resource> cover = musicService.displayCover(id);
+        return ResponseEntity.ok(cover.getBody());
     }
 
     @DeleteMapping("/delete/{id}")

@@ -43,6 +43,7 @@ public class MusicService {
     private final LabelRepository labelRepository;
     private final BandRepository bandRepository;
     private final FeatureRepository featureRepository;
+    private final ContentRepository contentRepository;
 
     @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<Object> uploadMusic(Music music, MultipartFile musicFile, MultipartFile imageFile) {
@@ -157,55 +158,6 @@ public class MusicService {
         return musicRepository.findAll();
     }
 
-    public Music getMusic(Long id){
-        return musicRepository.findById(id).orElse(null);
-    }
-
-    public ResponseEntity<InputStreamResource> playMusic(Long id) throws IOException {
-        Music music = musicRepository.findById(id).orElse(null);
-        if (music != null) {
-            Path path = Paths.get(music.getPath());
-            BufferedInputStream fileStream = new BufferedInputStream(new FileInputStream(path.toFile()));
-            InputStreamResource resource = new InputStreamResource(fileStream);
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Content-Disposition", "attachment; filename=\"" + path.getFileName().toString() + "\"");
-
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .contentLength(path.toFile().length())
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .body(resource);
-        }
-        return ResponseEntity.notFound().build();
-    }
-
-    public ResponseEntity<Resource> displayImage(Long id) {
-        try {
-            Music music = musicRepository.findById(id).orElse(null);
-            if (music != null) {
-                Path path = Paths.get(music.getMusicRelease().getCover());
-                Resource resource = new UrlResource(path.toUri());
-
-                if (resource.exists() || resource.isReadable()) {
-                    HttpHeaders headers = new HttpHeaders();
-                    headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"");
-
-                    return ResponseEntity.ok()
-                            .headers(headers)
-                            .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                            .body(resource);
-                } else {
-                    throw new RuntimeException("Could not read the file!");
-                }
-            } else {
-                throw new RuntimeException("Could not read the file!");
-            }
-
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Error: " + e.getMessage());
-        }
-    }
     public void delete(Long id) {
         musicRepository.deleteById(id);
     }
@@ -234,6 +186,37 @@ public class MusicService {
 
         Path filePath = Paths.get(uploadImgDir + fileName);
         Files.write(filePath, file.getBytes());
+    }
+
+    public ResponseEntity<Resource> displayCover(Long id){
+        try{
+            Content content = contentRepository.findById(id).orElse(null);
+            if(content != null){
+                if(content.getPath().contains("/music") && content.getPath().endsWith(".mp3")){
+                    Music music = musicRepository.findById(content.getId()).orElse(null);
+                    if(music != null){
+                        Path path = Paths.get(music.getMusicRelease().getCover());
+                        Resource resource = new UrlResource(path.toUri());
+                        if(resource.exists() || resource.isReadable()){
+                            HttpHeaders headers = new HttpHeaders();
+                            headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"");
+
+                            return ResponseEntity.ok()
+                                    .headers(headers)
+                                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                                    .body(resource);
+                        } else {
+                            throw new RuntimeException("Não foi possível ler o arquivo!");
+                        }
+                    }
+                } else {
+                    return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+                }
+            }
+        }catch (MalformedURLException e) {
+            throw new RuntimeException("Erro: " + e.getMessage());
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
 
 }
