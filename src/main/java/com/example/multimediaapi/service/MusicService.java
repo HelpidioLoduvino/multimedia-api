@@ -3,6 +3,8 @@ package com.example.multimediaapi.service;
 import com.example.multimediaapi.dto.MusicDto;
 import com.example.multimediaapi.model.*;
 import com.example.multimediaapi.repository.*;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.core.io.InputStreamResource;
 import lombok.AllArgsConstructor;
@@ -14,9 +16,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -176,6 +180,32 @@ public class MusicService {
         return ResponseEntity.notFound().build();
     }
 
+    public ResponseEntity<Resource> displayImage(Long id) {
+        try {
+            Music music = musicRepository.findById(id).orElse(null);
+            if (music != null) {
+                Path path = Paths.get(music.getMusicRelease().getCover());
+                Resource resource = new UrlResource(path.toUri());
+
+                if (resource.exists() || resource.isReadable()) {
+                    HttpHeaders headers = new HttpHeaders();
+                    headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"");
+
+                    return ResponseEntity.ok()
+                            .headers(headers)
+                            .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                            .body(resource);
+                } else {
+                    throw new RuntimeException("Could not read the file!");
+                }
+            } else {
+                throw new RuntimeException("Could not read the file!");
+            }
+
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Error: " + e.getMessage());
+        }
+    }
     public void delete(Long id) {
         musicRepository.deleteById(id);
     }

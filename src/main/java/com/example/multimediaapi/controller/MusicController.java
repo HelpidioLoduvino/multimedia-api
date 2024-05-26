@@ -1,23 +1,27 @@
 package com.example.multimediaapi.controller;
 
-import com.example.multimediaapi.dto.MusicDto;
 import com.example.multimediaapi.model.Music;
 import com.example.multimediaapi.service.MusicService;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/music")
-@CrossOrigin(origins = "http://localhost:4200")
 @AllArgsConstructor
 public class MusicController {
+
     private final MusicService musicService;
 
     @PostMapping("/upload")
@@ -41,9 +45,17 @@ public class MusicController {
         return ResponseEntity.ok(music.getBody());
     }
 
+    @GetMapping("/display/{id}")
+    public ResponseEntity<Resource> displayImage(@PathVariable Long id){
+        ResponseEntity<Resource> image = musicService.displayImage(id);
+        return ResponseEntity.ok(image.getBody());
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> delete(@PathVariable Long id) {
         musicService.delete(id);
         return ResponseEntity.ok().build();
     }
+
+
 }
