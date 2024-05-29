@@ -1,8 +1,6 @@
 package com.example.multimediaapi.service;
 
-import com.example.multimediaapi.dto.LoginDto;
-import com.example.multimediaapi.dto.LoginResponseDto;
-import com.example.multimediaapi.dto.UserDto;
+import com.example.multimediaapi.dto.*;
 import com.example.multimediaapi.model.User;
 import com.example.multimediaapi.repository.UserRepository;
 import com.example.multimediaapi.security.TokenService;
@@ -67,10 +65,25 @@ public class UserService implements UserDetailsService {
         Authentication authentication = authenticationManager.authenticate(emailPassword);
         User user = (User) authentication.getPrincipal();
         var token = tokenService.generateToken((User) authentication.getPrincipal());
+        var refreshToken = tokenService.generateRefreshToken((User) authentication.getPrincipal());
         String email = user.getEmail();
         String userRole = user.getAuthorities().iterator().next().getAuthority();
         Long id = user.getId();
-        return ResponseEntity.ok(new LoginResponseDto(id, token, email, userRole));
+        return ResponseEntity.ok(new LoginResponseDto(id, token, refreshToken, email, userRole));
+    }
+
+    public ResponseEntity<?> refresh(@RequestBody TokenRefreshRequest request) {
+        try {
+            String email = tokenService.validateToken(request.refreshToken());
+            User user = new User();
+            user.setEmail(email);
+            String newAccessToken = tokenService.generateToken(user);
+            String newRefreshToken = tokenService.generateRefreshToken(user);
+
+            return ResponseEntity.ok(new TokensResponse(newAccessToken, newRefreshToken));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(401).body("Invalid Refresh Token");
+        }
     }
 
     public List<UserDto> getAllUsers() {

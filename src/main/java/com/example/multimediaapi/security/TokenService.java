@@ -20,15 +20,27 @@ public class TokenService {
     public String generateToken(User user) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
-            String token = JWT.create()
+
+            return JWT.create()
                     .withIssuer("multimediaAPI")
                     .withSubject(user.getEmail())
-                    .withExpiresAt(this.generateExpirationDate())
+                    //.withExpiresAt(this.generateExpirationDate())
                     .sign(algorithm);
-
-            return token;
         }catch (JWTCreationException jce){
             throw new RuntimeException("ERROR WHILE GENERATING TOKEN", jce);
+        }
+    }
+
+    public String generateRefreshToken(User user) {
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(secret);
+            return JWT.create()
+                    .withIssuer("multimediaAPI")
+                    .withSubject(user.getEmail())
+                    //.withExpiresAt(this.generateRefreshTokenExpirationDate())
+                    .sign(algorithm);
+        } catch (JWTCreationException jce) {
+            throw new RuntimeException("ERROR WHILE GENERATING REFRESH TOKEN", jce);
         }
     }
 
@@ -44,9 +56,16 @@ public class TokenService {
             throw new RuntimeException("ERROR WHILE VALIDATING TOKEN", jce);
         }
     }
+    /*
 
     private Instant generateExpirationDate() {
-        return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("+01:00"));
+        return LocalDateTime.now().plusDays(2).toInstant(ZoneOffset.of("+01:00"));
     }
+
+    private Instant generateRefreshTokenExpirationDate() {
+        return LocalDateTime.now().plusDays(7).toInstant(ZoneOffset.of("+01:00"));
+    }
+
+     */
 
 }

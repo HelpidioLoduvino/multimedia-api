@@ -1,6 +1,7 @@
 package com.example.multimediaapi.controller;
 
 import com.example.multimediaapi.dto.LoginDto;
+import com.example.multimediaapi.dto.TokenRefreshRequest;
 import com.example.multimediaapi.model.User;
 import com.example.multimediaapi.service.UserService;
 import lombok.AllArgsConstructor;
@@ -37,6 +38,11 @@ public class UserController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteUser(@PathVariable Long id) {
         return ResponseEntity.ok(userService.deleteUser(id));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<Object> refresh(@RequestBody TokenRefreshRequest request) {
+        return ResponseEntity.ok(userService.refresh(request));
     }
 
 }
