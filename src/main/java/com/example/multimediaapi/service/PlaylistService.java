@@ -14,10 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,6 +40,29 @@ public class PlaylistService {
 
     public List<Playlist> getAllPlaylists(){
         return playListRepository.findAll();
+    }
+    public ResponseEntity<List<Playlist>> getAllPlaylistsByUserId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
+        Object principal = auth.getPrincipal();
+        String email = ((UserDetails) principal).getUsername();
+        User user = userRepository.findByUserEmail(email);
+        Long userId = user.getId();
+        return ResponseEntity.ok(playListRepository.findAllByUserId(userId));
+    }
+
+    public Playlist getPlaylistById(Long id){
+        return playListRepository.findById(id).orElse(null);
+    }
+
+    public ResponseEntity<List<Playlist>> getAllPublicPlaylists(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
+        Object principal = auth.getPrincipal();
+        String email = ((UserDetails) principal).getUsername();
+        User user = userRepository.findByUserEmail(email);
+        Long userId = user.getId();
+        return ResponseEntity.ok(playListRepository.findAllPublicPlaylistsWithDifferentUserId(userId));
     }
 
     public void deletePlaylist(Long id){

@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -13,9 +15,11 @@ public class PlaylistContent {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne
     private Playlist playlist;
-    @ManyToOne
-    private Content Content;
+
+    @OneToMany()
+    private List<Content> contents;
 
 }
