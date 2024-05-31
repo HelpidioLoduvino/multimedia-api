@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.sound.midi.Track;
 import java.util.List;
 
 @Entity
@@ -24,5 +25,5 @@ public class Playlist {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
+    
 }

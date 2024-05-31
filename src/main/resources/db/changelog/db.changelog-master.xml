@@ -6,4 +6,5 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
         <!-- <include file="db/changelog/001-drop-database.sql"/> -->
+        <!-- <include file="db/changelog/002-drop-table-playlist_content.sql"/> -->
 </databaseChangeLog>

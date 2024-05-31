@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -17,9 +18,11 @@ public class PlaylistContent {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "playlist_id")
     private Playlist playlist;
 
-    @OneToMany()
-    private List<Content> contents;
+    @ManyToOne
+    @JoinColumn(name = "content_id")
+    private Content content;
 
 }

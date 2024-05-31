@@ -1,5 +1,6 @@
 package com.example.multimediaapi.controller;
 
+import com.example.multimediaapi.dto.ContentPlaylistDto;
 import com.example.multimediaapi.model.Playlist;
 import com.example.multimediaapi.service.PlaylistService;
 import lombok.AllArgsConstructor;
@@ -33,8 +34,8 @@ public class PlaylistController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getPlaylistById(@PathVariable long id){
-        return ResponseEntity.ok(playlistService.getPlaylistById(id));
+    public ResponseEntity<Object> getPlaylistById(@PathVariable Long id){
+        return ResponseEntity.ok(playlistService.getAllPlaylistContentByPlaylistId(id));
     }
 
     @DeleteMapping("/delete/{id}")
@@ -42,4 +43,15 @@ public class PlaylistController {
         playlistService.deletePlaylist(id);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/add-content-to-playlist")
+    public ResponseEntity<Object> addPlaylistContent(@RequestBody ContentPlaylistDto contentToPlaylistDto){
+        return ResponseEntity.ok(playlistService.addContentToPlaylist(contentToPlaylistDto));
+    }
+
+    @GetMapping("/all-playlist-content")
+    public ResponseEntity<Object> getAllPlaylistContent(){
+        return ResponseEntity.ok(playlistService.getAllPlaylistContents());
+    }
+
 }

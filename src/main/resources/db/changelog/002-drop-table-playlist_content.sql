@@ -1,0 +1,1 @@
+drop table playlist_content;

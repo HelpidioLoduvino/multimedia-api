@@ -1,10 +1,12 @@
 package com.example.multimediaapi.service;
-
+import com.example.multimediaapi.dto.ContentPlaylistDto;
 import com.example.multimediaapi.model.Content;
 import com.example.multimediaapi.model.Playlist;
+import com.example.multimediaapi.model.PlaylistContent;
 import com.example.multimediaapi.model.User;
 import com.example.multimediaapi.repository.ContentRepository;
 import com.example.multimediaapi.repository.PlayListRepository;
+import com.example.multimediaapi.repository.PlaylistContentRepository;
 import com.example.multimediaapi.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,14 +17,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class PlaylistService {
     private final PlayListRepository playListRepository;
-    private final ContentRepository contentRepository;
     private final UserRepository userRepository;
+    private final ContentRepository contentRepository;
+    private final PlaylistContentRepository playlistContentRepository;
 
     public ResponseEntity<Object> addPlaylist(Playlist playList){
         try {
@@ -51,10 +53,6 @@ public class PlaylistService {
         return ResponseEntity.ok(playListRepository.findAllByUserId(userId));
     }
 
-    public Playlist getPlaylistById(Long id){
-        return playListRepository.findById(id).orElse(null);
-    }
-
     public ResponseEntity<List<Playlist>> getAllPublicPlaylists(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
@@ -67,6 +65,32 @@ public class PlaylistService {
 
     public void deletePlaylist(Long id){
         playListRepository.deleteById(id);
+    }
+
+
+    public ResponseEntity<Object> addContentToPlaylist(ContentPlaylistDto contentToPlaylistDto) {
+
+        Content content = contentRepository.findById(contentToPlaylistDto.contentId())
+                .orElseThrow(() -> new RuntimeException("Content not found"));
+
+        Playlist playlist = playListRepository.findById(contentToPlaylistDto.playlistId())
+                .orElseThrow(() -> new RuntimeException("Playlist not found"));
+
+        PlaylistContent playlistContent = new PlaylistContent(null, playlist, content);
+
+        return ResponseEntity.ok(playlistContentRepository.save(playlistContent));
+    }
+
+    public ResponseEntity<List<PlaylistContent>> getAllPlaylistContentByPlaylistId(Long id){
+        List<PlaylistContent> playlistContents = playlistContentRepository.findAllByPlaylistId(id);
+        if (playlistContents.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return ResponseEntity.ok(playlistContents);
+    }
+
+    public List<PlaylistContent> getAllPlaylistContents(){
+        return playlistContentRepository.findAll();
     }
 
 }
