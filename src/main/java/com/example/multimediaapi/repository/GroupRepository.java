@@ -1,0 +1,15 @@
+package com.example.multimediaapi.repository;
+
+import com.example.multimediaapi.model.ShareGroup;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface GroupRepository extends JpaRepository<ShareGroup, Long> {
+    boolean existsByGroupName(String groupName);
+
+    ShareGroup findByGroupName(String groupName);
+
+}

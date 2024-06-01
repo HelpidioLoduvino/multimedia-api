@@ -9,10 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Data
@@ -48,17 +45,19 @@ public class User implements UserDetails {
     @PrePersist
     protected void onCreate() {
         if (createdAt == null) {
-            createdAt = new Date();
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(new Date());
+            calendar.add(Calendar.HOUR, 1);
+            createdAt = calendar.getTime();
         }
     }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
         if (this.userRole.equals("ADMIN")) {
             authorities.add(new SimpleGrantedAuthority("ADMIN"));
-        } else if (this.userRole.equals("MANAGER")) {
-            authorities.add(new SimpleGrantedAuthority("MANAGER"));
         } else if (this.userRole.equals("CLIENT")) {
             authorities.add(new SimpleGrantedAuthority("CLIENT"));
         }
