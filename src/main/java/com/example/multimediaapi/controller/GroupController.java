@@ -18,11 +18,6 @@ public class GroupController {
         return ResponseEntity.ok(groupService.createGroup(group));
     }
 
-    @GetMapping("/public")
-    public ResponseEntity<Object> getPublicGroup() {
-        return ResponseEntity.ok(groupService.getPublicGroup());
-    }
-
     @GetMapping("/all-my-groups")
     public ResponseEntity<Object> getAllMyGroups() {
         return ResponseEntity.ok(groupService.getAllMyGroups());
@@ -39,7 +34,27 @@ public class GroupController {
     }
 
     @PostMapping("/add-content-to-group")
-    public ResponseEntity<Object> addContentToGroup(@RequestParam Long id1, @RequestParam Long id2) {
-        return ResponseEntity.ok(groupService.addContentToSelectedGroup(id1, id2));
+    public ResponseEntity<Object> addContentToGroup(@RequestParam Long contentId, @RequestParam Long groupId) {
+        return ResponseEntity.ok(groupService.addContentToSelectedGroup(contentId, groupId));
+    }
+
+    @GetMapping("/all-contents-by-group-id/{id}")
+    public ResponseEntity<Object> getAllContentsByGroupId(@PathVariable Long id) {
+        return ResponseEntity.ok(groupService.getAllContentsByGroupId(id));
+    }
+
+    @GetMapping("/all-users-by-group-id/{id}")
+    public ResponseEntity<Object> getAllUsersByGroupId(@PathVariable Long id) {
+        return ResponseEntity.ok(groupService.getAllUsersByGroupId(id));
+    }
+
+    @PutMapping("/update-user-to-owner")
+    public ResponseEntity<Object> updateUserToOwner(@RequestParam Long userId, @RequestParam Long groupId) {
+        return ResponseEntity.ok(groupService.updateUserStatusToGroupOwner(userId, groupId));
+    }
+
+    @PutMapping("/update-user-to-editor")
+    public ResponseEntity<Object> updateUserToEditor(@RequestParam Long userId, @RequestParam Long groupId) {
+        return ResponseEntity.ok(groupService.updateUserToGroupEditor(userId, groupId));
     }
 }

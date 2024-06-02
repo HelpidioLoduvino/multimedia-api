@@ -33,13 +33,9 @@ public class GroupService {
 
         ShareGroup newShareGroup = groupRepository.save(shareGroup);
 
-        UserGroup newUserGroup = new UserGroup(null, user, newShareGroup);
+        UserGroup newUserGroup = new UserGroup(null, "Owner", true, user, newShareGroup);
 
         return ResponseEntity.ok(userGroupRepository.save(newUserGroup));
-    }
-
-    public ResponseEntity<ShareGroup> getPublicGroup(){
-        return ResponseEntity.ok(groupRepository.findByGroupName("Público"));
     }
 
     public ResponseEntity<Object> getAllMyGroups(){
@@ -75,6 +71,46 @@ public class GroupService {
         ContentShareGroup contentShareGroup = new ContentShareGroup(null, content, sg);
 
         return ResponseEntity.ok(contentShareGroupRepository.save(contentShareGroup));
+    }
+
+    public ResponseEntity<Object> addUserToGroup(Long userId, Long groupId){
+
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+
+        ShareGroup sg = groupRepository.findById(groupId).orElseThrow(() -> new RuntimeException("Group not found"));
+
+        UserGroup userGroup = new UserGroup(null, "Normal", false, user, sg);
+
+        return ResponseEntity.ok(userGroupRepository.save(userGroup));
+    }
+
+    public ResponseEntity<Object> updateUserStatusToGroupOwner(Long userId, Long groupId) {
+
+        UserGroup userGroup = userGroupRepository.findByUserIdAndShareGroupId(userId, groupId);
+
+        if(userGroup == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        userGroup.setUserStatus("Owner");
+        userGroup.setEditor(true);
+        return ResponseEntity.ok(userGroupRepository.save(userGroup));
+    }
+
+    public ResponseEntity<Object> updateUserToGroupEditor(Long userId, Long groupId) {
+        UserGroup userGroup = userGroupRepository.findByUserIdAndShareGroupId(userId, groupId);
+        if(userGroup == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        userGroup.setEditor(true);
+        return ResponseEntity.ok(userGroupRepository.save(userGroup));
+    }
+
+    public ResponseEntity<Object> getAllContentsByGroupId(Long groupId) {
+        return ResponseEntity.ok(contentShareGroupRepository.findAllByShareGroupId(groupId));
+    }
+
+    public ResponseEntity<Object> getAllUsersByGroupId(Long groupId) {
+        return ResponseEntity.ok(userGroupRepository.findAllByShareGroupId(groupId));
     }
 
 }

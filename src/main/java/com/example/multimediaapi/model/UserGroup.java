@@ -14,6 +14,10 @@ public class UserGroup {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String userStatus;
+
+    private boolean isEditor;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

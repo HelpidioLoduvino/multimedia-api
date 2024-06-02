@@ -9,7 +9,4 @@ import java.util.List;
 @Repository
 public interface GroupRepository extends JpaRepository<ShareGroup, Long> {
     boolean existsByGroupName(String groupName);
-
-    ShareGroup findByGroupName(String groupName);
-
 }

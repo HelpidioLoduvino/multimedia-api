@@ -19,6 +19,7 @@ public class MultimediaApiApplication {
 		SpringApplication.run(MultimediaApiApplication.class, args);
 	}
 
+
 	@Bean
 	CommandLineRunner initDatabase(UserRepository userRepository, GroupRepository groupRepository, UserGroupRepository userGroupRepository) {
 		return args -> {
@@ -42,7 +43,7 @@ public class MultimediaApiApplication {
 				firstShareGroup.setGroupName("Público");
 				firstShareGroup.setGroupStatus("Público");
 				ShareGroup shareGroup = groupRepository.save(firstShareGroup);
-				UserGroup firstUserGroup = new UserGroup(null, adminUser, shareGroup);
+				UserGroup firstUserGroup = new UserGroup(null, "Owner", true, adminUser, shareGroup);
 				userGroupRepository.save(firstUserGroup);
 			}
 		};
