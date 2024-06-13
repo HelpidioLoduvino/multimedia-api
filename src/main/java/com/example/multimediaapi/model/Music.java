@@ -22,28 +22,16 @@ public class Music extends Content{
     private String lyric;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    @ManyToOne
     @JoinColumn(name = "genre_id")
     private Category genre;
 
     @ManyToOne
-    @JoinColumn(name = "music_release_id")
-    private MusicRelease musicRelease;
+    @JoinColumn(name = "album_id")
+    private Album album;
 
     @ManyToOne
-    @JoinColumn(name = "author_id")
-    private Author author;
-
-    @ManyToMany
-    @JoinTable(
-            name = "music_feature",
-            joinColumns = @JoinColumn(name = "music_id"),
-            inverseJoinColumns = @JoinColumn(name = "feature_id ")
-    )
-    private List<Feature> features;
+    @JoinColumn(name = "musicRelease_id")
+    private MusicRelease musicRelease;
 
     @ManyToMany
     @JoinTable(

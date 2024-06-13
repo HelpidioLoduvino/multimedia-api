@@ -95,6 +95,8 @@ public class VideoService {
             newVideo.setPath(uploadVideoDir + videoFileName);
             newVideo.setUser(user);
             newVideo.setAuthor(author);
+            newVideo.setMimetype(videoFile.getContentType());
+            newVideo.setSize(videoFile.getSize());
             newVideo.setFeatures(features);
             videoRepository.save(newVideo);
             return ResponseEntity.ok(newVideo);

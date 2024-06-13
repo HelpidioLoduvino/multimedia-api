@@ -15,14 +15,17 @@ public class AlbumReview {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Range(min = 0, max = 10)
-    private Integer rating;
+    private int rating;
 
-    @Column(length = 300)
+    @Column(columnDefinition = "LONGTEXT")
     private String overview;
 
     @ManyToOne
     @JoinColumn(name = "album_id")
     private MusicRelease musicRelease;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
 }

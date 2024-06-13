@@ -17,8 +17,8 @@ public class MusicRelease {
     private Long id;
     private String musicReleaseName;
     private String musicReleaseDescription;
-    private String releaseType;
     private Date releaseDate;
+    private String releaseType;
     private String cover;
 
 }

@@ -1,5 +1,6 @@
 package com.example.multimediaapi.service;
 
+import com.example.multimediaapi.dto.ContentGroupDTO;
 import com.example.multimediaapi.dto.MusicDto;
 import com.example.multimediaapi.model.*;
 import com.example.multimediaapi.repository.*;
@@ -25,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -38,6 +40,8 @@ public class MusicService {
     private final MusicRepository musicRepository;
     private final AuthorRepository authorRepository;
     private final CategoryRepository categoryRepository;
+    private final GroupRepository groupRepository;
+    private final ContentShareGroupRepository contentShareGroupRepository;
     private final SongWriterRepository songWriterRepository;
     private final MusicReleaseRepository musicReleaseRepository;
     private final LabelRepository labelRepository;
@@ -46,7 +50,7 @@ public class MusicService {
     private final ContentRepository contentRepository;
 
     @Transactional(rollbackFor = Exception.class)
-    public ResponseEntity<Object> uploadMusic(Music music, MultipartFile musicFile, MultipartFile imageFile) {
+    public ResponseEntity<Object> uploadMusic(Music music, String group, MultipartFile musicFile, MultipartFile imageFile) {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
@@ -135,20 +139,31 @@ public class MusicService {
                         return songWriter;
                     }).collect(Collectors.toList());
 
-
             Music newMusic = new Music();
             newMusic.setTitle(music.getTitle());
             newMusic.setPath(uploadDir + musicFileName);
             newMusic.setUser(user);
-            newMusic.setMusicRelease(musicRelease);
             newMusic.setGenre(genre);
+            newMusic.setMusicRelease(musicRelease);
             newMusic.setAuthor(author);
+            newMusic.setMimetype(musicFile.getContentType());
+            newMusic.setSize(musicFile.getSize());
             newMusic.setFeatures(features);
             newMusic.setSongwriters(songWriters);
             newMusic.setLyric(music.getLyric());
-            musicRepository.save(newMusic);
+            Music savedMusic = musicRepository.save(newMusic);
 
-            return ResponseEntity.ok(newMusic);
+            if(group.isEmpty()){
+                group = "Público";
+            }
+
+            ShareGroup shareGroup = groupRepository.findByGroupName(group);
+
+            ContentShareGroup contentShareGroup = new ContentShareGroup(null, savedMusic, shareGroup);
+
+            contentShareGroupRepository.save(contentShareGroup);
+
+            return ResponseEntity.ok(contentShareGroup);
         }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error while uploading music: " + e.getMessage());
         }
@@ -192,7 +207,7 @@ public class MusicService {
         try{
             Content content = contentRepository.findById(id).orElse(null);
             if(content != null){
-                if(content.getPath().contains("/music") && content.getPath().endsWith(".mp3")){
+                if(content.getMimetype().startsWith("audio")){
                     Music music = musicRepository.findById(content.getId()).orElse(null);
                     if(music != null){
                         Path path = Paths.get(music.getMusicRelease().getCover());

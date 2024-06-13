@@ -8,4 +8,5 @@
         <!-- <include file="db/changelog/001-drop-database.sql"/> -->
         <!-- <include file="db/changelog/002-drop-table-playlist_content.sql"/> -->
         <!-- <include file="db/changelog/003-drop-table-share_group.sql"/>-->
+        <!-- <include file="db/changelog/004-drop-table-album_review.sql"/> -->
 </databaseChangeLog>

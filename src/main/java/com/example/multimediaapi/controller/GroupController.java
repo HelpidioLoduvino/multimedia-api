@@ -1,10 +1,13 @@
 package com.example.multimediaapi.controller;
 
+import com.example.multimediaapi.model.ContentShareGroup;
 import com.example.multimediaapi.model.ShareGroup;
 import com.example.multimediaapi.service.GroupService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -23,9 +26,9 @@ public class GroupController {
         return ResponseEntity.ok(groupService.getAllMyGroups());
     }
 
-    @GetMapping("all-except-public")
-    public ResponseEntity<Object> getAllExceptPublicGroups() {
-        return ResponseEntity.ok(groupService.getAllGroupsExceptPublic());
+    @GetMapping("all-except-my-and-public-groups")
+    public ResponseEntity<Object> getAllExceptMyAndPublicGroups() {
+        return ResponseEntity.ok(groupService.getAllExceptMyAndPublicGroups());
     }
 
     @GetMapping("/all")
@@ -48,6 +51,12 @@ public class GroupController {
         return ResponseEntity.ok(groupService.getAllUsersByGroupId(id));
     }
 
+    @GetMapping("/all-contents-from-public-group")
+    public ResponseEntity<List<ContentShareGroup>> getAllContentsFromPublicGroup() {
+        ResponseEntity<List<ContentShareGroup>> response = groupService.getAllContentsFromPublicGroup();
+        return ResponseEntity.ok(response.getBody());
+    }
+
     @PutMapping("/update-user-to-owner")
     public ResponseEntity<Object> updateUserToOwner(@RequestParam Long userId, @RequestParam Long groupId) {
         return ResponseEntity.ok(groupService.updateUserStatusToGroupOwner(userId, groupId));
@@ -56,5 +65,10 @@ public class GroupController {
     @PutMapping("/update-user-to-editor")
     public ResponseEntity<Object> updateUserToEditor(@RequestParam Long userId, @RequestParam Long groupId) {
         return ResponseEntity.ok(groupService.updateUserToGroupEditor(userId, groupId));
+    }
+
+    @PostMapping("/request-to-join-group")
+    public ResponseEntity<Object> requestToJoinGroup(@RequestParam Long groupId) {
+        return ResponseEntity.ok(groupService.requestToJoinGroup(groupId));
     }
 }

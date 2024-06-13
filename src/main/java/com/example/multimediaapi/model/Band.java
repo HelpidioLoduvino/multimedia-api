@@ -20,4 +20,7 @@ public class Band {
     private String history;
     private Integer start;
     private Integer end;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }
