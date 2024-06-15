@@ -18,14 +18,18 @@ import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
+import java.util.OptionalDouble;
 
 @Service
 @AllArgsConstructor
 public class AlbumService {
 
     private final MusicReleaseRepository musicReleaseRepository;
-    private AlbumReviewRepository albumReviewRepository;
+    private final AlbumReviewRepository albumReviewRepository;
     private final UserRepository userRepository;
+    private final MusicRepository musicRepository;
+
 
     public ResponseEntity<List<MusicRelease>> getAllAlbums() {
         List<MusicRelease> albums = musicReleaseRepository.findAllByReleaseType("Album");
@@ -57,22 +61,62 @@ public class AlbumService {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
 
-    public ResponseEntity<AlbumReview> addAlbumReview(AlbumReview albumReview, Long albumId){
+    public ResponseEntity<AlbumReview> addAlbumReview(AlbumReview albumReview, Long albumId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
+        if (auth == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         Object principal = auth.getPrincipal();
         String email = ((UserDetails) principal).getUsername();
         User user = userRepository.findByUserEmail(email);
+        Long userId = user.getId();
+
+        AlbumReview userReview = albumReviewRepository.findByUser_IdAndMusicRelease_Id(userId, albumId);
+        if (userReview != null) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
 
         MusicRelease album = musicReleaseRepository.findById(albumId).orElse(null);
-        if(album == null){
+        if (album == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        AlbumReview review = new AlbumReview(null, albumReview.getRating(), albumReview.getOverview(), album, user);
+        AlbumReview review = new AlbumReview(null, albumReview.getRating(), 0, albumReview.getOverview(), album, user);
+        albumReviewRepository.save(review);
 
-        return ResponseEntity.ok(albumReviewRepository.save(review));
+        List<AlbumReview> albumReviews = albumReviewRepository.findByMusicRelease_Id(albumId);
+        double totalRatings = albumReviews.stream().mapToInt(AlbumReview::getRating).sum();
+        double media = totalRatings / albumReviews.size();
 
+        albumReviews.forEach(r -> {
+            r.setMedia(media);
+            albumReviewRepository.save(r);
+        });
+
+        return ResponseEntity.ok(review);
+    }
+
+    public ResponseEntity<MusicRelease> getAlbum(Long albumId){
+        return ResponseEntity.ok(musicReleaseRepository.findById(albumId).orElse(null));
+    }
+
+    public List<AlbumReview> getAlbumReviews(Long albumId){
+        return albumReviewRepository.findByMusicRelease_Id(albumId);
+    }
+
+    public Double getAlbumReviewOverall(Long albumId) {
+        List<Double> medias = albumReviewRepository.findMediaByMusicRelease_id(albumId);
+
+        if (medias == null || medias.isEmpty()) {
+            return 0.0;
+        }
+
+        return medias.get(0);
+    }
+
+    public List<Music> getMusicFromAlbum(Long albumId){
+        return musicRepository.findByMusicRelease_Id(albumId);
     }
 
 }

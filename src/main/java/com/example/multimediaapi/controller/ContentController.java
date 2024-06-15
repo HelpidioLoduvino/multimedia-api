@@ -40,44 +40,11 @@ public class ContentController {
         return ResponseEntity.ok(contentService.getAllContentsByUserId());
     }
 
-    @GetMapping("/play/{id}")
-    public ResponseEntity<InputStreamResource> playContent(@PathVariable Long id, @RequestHeader HttpHeaders headers) throws IOException {
-        Content content = contentRepository.findById(id).orElse(null);
-
-        if (content == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-
-        String contentPath = content.getPath();
-        File file = new File(contentPath);
-        long fileSize = file.length();
-
-        List<HttpRange> ranges = headers.getRange();
-        if (ranges.isEmpty()) {
-            InputStream inputStream = new FileInputStream(file);
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_TYPE, content.getMimetype())
-                    .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(fileSize))
-                    .body(new InputStreamResource(inputStream));
-        } else {
-            HttpRange range = ranges.get(0);
-            long start = range.getRangeStart(fileSize);
-            long end = range.getRangeEnd(fileSize);
-            long contentLength = end - start + 1;
-
-            InputStream inputStream = new FileInputStream(file);
-            inputStream.skip(start);
-
-            HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set(HttpHeaders.CONTENT_TYPE, content.getMimetype());
-            responseHeaders.set(HttpHeaders.CONTENT_LENGTH, String.valueOf(contentLength));
-            responseHeaders.set(HttpHeaders.CONTENT_RANGE, "bytes " + start + "-" + end + "/" + fileSize);
-
-            return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
-                    .headers(responseHeaders)
-                    .body(new InputStreamResource(inputStream));
-        }
+    @GetMapping("/stream-content/{id}")
+    public void streamVideo(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        contentService.streamContent(id, request, response);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<Content> getContentById(@PathVariable Long id) {

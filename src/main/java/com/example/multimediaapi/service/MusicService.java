@@ -1,13 +1,10 @@
 package com.example.multimediaapi.service;
 
-import com.example.multimediaapi.dto.ContentGroupDTO;
-import com.example.multimediaapi.dto.MusicDto;
 import com.example.multimediaapi.model.*;
 import com.example.multimediaapi.repository.*;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.core.io.InputStreamResource;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,7 +14,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -34,8 +30,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class MusicService {
 
-    private final String uploadDir = "src/main/resources/static/music/";
-    private final String uploadImgDir = "src/main/resources/static/cover/";
+    private static final String uploadDir = "src/main/resources/static/music/";
+    private static final String uploadImgDir = "src/main/resources/static/cover/";
     private final UserRepository userRepository;
     private final MusicRepository musicRepository;
     private final AuthorRepository authorRepository;
@@ -61,6 +57,7 @@ public class MusicService {
 
             String musicFileName = generateUniqueFileName(musicFile.getOriginalFilename());
             String imageFileName = generateUniqueFileName(imageFile.getOriginalFilename());
+
             saveMusicFile(musicFile, musicFileName);
             saveImgFile(imageFile, imageFileName);
 
@@ -232,6 +229,19 @@ public class MusicService {
             throw new RuntimeException("Erro: " + e.getMessage());
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+    }
+
+    public ResponseEntity<List<Music>> getAllMusicsByUserId(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
+        Object principal = auth.getPrincipal();
+        String email = ((UserDetails) principal).getUsername();
+
+        User user = userRepository.findByUserEmail(email);
+        Long userId = user.getId();
+
+        return ResponseEntity.ok(musicRepository.findAllByUserId(userId));
+
     }
 
 }

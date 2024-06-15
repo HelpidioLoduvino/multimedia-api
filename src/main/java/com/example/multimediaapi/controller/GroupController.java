@@ -51,9 +51,15 @@ public class GroupController {
         return ResponseEntity.ok(groupService.getAllUsersByGroupId(id));
     }
 
-    @GetMapping("/all-contents-from-public-group")
-    public ResponseEntity<List<ContentShareGroup>> getAllContentsFromPublicGroup() {
-        ResponseEntity<List<ContentShareGroup>> response = groupService.getAllContentsFromPublicGroup();
+    @GetMapping("/all-musics-from-public-group")
+    public ResponseEntity<List<ContentShareGroup>> getAllMusicsFromPublicGroup() {
+        ResponseEntity<List<ContentShareGroup>> response = groupService.getAllMusicsFromPublicGroup();
+        return ResponseEntity.ok(response.getBody());
+    }
+
+    @GetMapping("/all-videos-from-public-group")
+    public ResponseEntity<List<ContentShareGroup>> getAllVideosFromPublicGroup() {
+        ResponseEntity<List<ContentShareGroup>> response = groupService.getAllVideosFromPublicGroup();
         return ResponseEntity.ok(response.getBody());
     }
 

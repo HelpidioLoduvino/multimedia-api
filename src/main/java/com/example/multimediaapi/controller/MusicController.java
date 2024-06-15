@@ -35,6 +35,11 @@ public class MusicController {
         return ResponseEntity.ok(musicService.getAll());
     }
 
+    @GetMapping("all-musics-by-user-id")
+    public ResponseEntity<List<Music>> getAllContentsByUserId() {
+        return ResponseEntity.ok(musicService.getAllMusicsByUserId().getBody());
+    }
+
     @GetMapping("/cover/{id}")
     public ResponseEntity<Resource> displayMusicCover(@PathVariable Long id) {
         ResponseEntity<Resource> cover = musicService.displayCover(id);

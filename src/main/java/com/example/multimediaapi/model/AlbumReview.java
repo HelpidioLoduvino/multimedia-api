@@ -17,6 +17,8 @@ public class AlbumReview {
 
     private int rating;
 
+    private double media = 0;
+
     @Column(columnDefinition = "LONGTEXT")
     private String overview;
 

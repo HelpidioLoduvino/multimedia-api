@@ -2,6 +2,7 @@ package com.example.multimediaapi.service;
 
 import com.example.multimediaapi.model.Content;
 import com.example.multimediaapi.model.User;
+import com.example.multimediaapi.model.Video;
 import com.example.multimediaapi.repository.ContentRepository;
 import com.example.multimediaapi.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -48,8 +49,7 @@ public class ContentService {
         return contentRepository.findById(id).orElse(null);
     }
 
-
-    public void playContent(Long id, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void streamContent(Long id, HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         Content content = contentRepository.findById(id).orElse(null);
 
@@ -142,30 +142,5 @@ public class ContentService {
             return 10;
         }
     }
-
-
-
-
-    /*
-    public ResponseEntity<Resource> playContent(Long id) throws IOException {
-        Content content = contentRepository.findById(id).orElse(null);
-        if (content != null) {
-            Path path = Paths.get(content.getPath());
-            Resource resource = new UrlResource(path.toUri());
-            if(resource.exists() && resource.isReadable()){
-                HttpHeaders headers = new HttpHeaders();
-                headers.add("Content-Disposition", "attachment; filename=\"" + path.getFileName().toString() + "\"");
-                return ResponseEntity.ok()
-                        .headers(headers)
-                        .contentLength(path.toFile().length())
-                        .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                        .body(resource);
-            }
-
-        }
-        return ResponseEntity.notFound().build();
-    }
-
-     */
 
 }

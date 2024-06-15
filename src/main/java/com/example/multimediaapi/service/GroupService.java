@@ -3,6 +3,7 @@ package com.example.multimediaapi.service;
 import com.example.multimediaapi.model.*;
 import com.example.multimediaapi.repository.*;
 import lombok.AllArgsConstructor;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -39,15 +40,26 @@ public class GroupService {
         return ResponseEntity.ok(userGroupRepository.save(newUserGroup));
     }
 
-    public ResponseEntity<List<ContentShareGroup>> getAllContentsFromPublicGroup(){
+    public ResponseEntity<List<ContentShareGroup>> getAllMusicsFromPublicGroup(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
         Object principal = auth.getPrincipal();
         String email = ((UserDetails) principal).getUsername();
         User user = userRepository.findByUserEmail(email);
 
-        return ResponseEntity.ok(contentShareGroupRepository.findAllByShareGroupGroupNameOrContent_User("Público", user));
+        return ResponseEntity.ok(contentShareGroupRepository.findAllByShareGroupGroupNameAndContent_MimetypeStartingWithOrContent_UserAndContent_MimetypeStartingWith("Público", "audio", user, "audio"));
     }
+
+    public ResponseEntity<List<ContentShareGroup>> getAllVideosFromPublicGroup(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
+        Object principal = auth.getPrincipal();
+        String email = ((UserDetails) principal).getUsername();
+        User user = userRepository.findByUserEmail(email);
+
+        return ResponseEntity.ok(contentShareGroupRepository.findAllByShareGroupGroupNameAndContent_MimetypeStartingWithOrContent_UserAndContent_MimetypeStartingWith("Público", "video", user, "video"));
+    }
+
 
     public ResponseEntity<Object> getAllMyGroups(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -154,8 +166,9 @@ public class GroupService {
         ShareGroup shareGroup = groupRepository.findById(groupId).orElseThrow(() -> new RuntimeException("Group not found"));
 
         RequestToJoinGroup requestToJoinGroup = new RequestToJoinGroup(null, user, shareGroup);
+        requestToJoinGroupRepository.save(requestToJoinGroup);
 
-        return ResponseEntity.ok(requestToJoinGroupRepository.save(requestToJoinGroup));
+        return ResponseEntity.ok().build();
     }
 
     /*

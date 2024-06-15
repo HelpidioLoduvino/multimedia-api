@@ -9,10 +9,11 @@ import java.util.List;
 
 @Repository
 public interface AlbumReviewRepository extends JpaRepository<AlbumReview, Long> {
+    List<AlbumReview> findByMusicRelease_Id(Long albumId);
 
-    /*
-    @Query("SELECT new com.example.multimediaapi.model.AlbumReview(a.id, a.rating, a.overview, a.album) from AlbumReview a where a.album.id = :albumId")
-    List<AlbumReview> findOverviewsByAlbumId(Long albumId);
+    AlbumReview findByUser_IdAndMusicRelease_Id(Long userId, Long musicReleaseId);
 
-     */
+    @Query("SELECT ar.media FROM AlbumReview ar WHERE ar.musicRelease.id = :albumId ORDER BY ar.id DESC")
+    List<Double> findMediaByMusicRelease_id(Long albumId);
+
 }

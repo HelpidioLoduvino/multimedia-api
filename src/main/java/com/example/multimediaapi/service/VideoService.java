@@ -2,9 +2,13 @@ package com.example.multimediaapi.service;
 
 import com.example.multimediaapi.model.*;
 import com.example.multimediaapi.repository.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,14 +16,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.apache.commons.io.FileUtils;
 
 @Service
 @AllArgsConstructor
@@ -31,11 +37,15 @@ public class VideoService {
     private final FeatureRepository featureRepository;
     private final LabelRepository labelRepository;
     private final BandRepository bandRepository;
-    private final String uploadVideoDir = "src/main/resources/static/video/";
+    private final GroupRepository groupRepository;
+    private final ContentShareGroupRepository contentShareGroupRepository;
+    private final VideoCompressionService videoCompressionService;
+    private static final String uploadVideoDir = "src/main/resources/static/video/";
+    private static final String compressedVideoDir = "src/main/resources/static/video/";
 
 
     @Transactional(rollbackFor = Exception.class)
-    public ResponseEntity<Object> uploadVideo(Video video, MultipartFile videoFile) {
+    public ResponseEntity<Object> uploadVideo(Video video, String group, MultipartFile videoFile) {
         try{
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
@@ -44,7 +54,16 @@ public class VideoService {
 
             User user = userRepository.findByUserEmail(email);
             String videoFileName = generateUniqueFileName(videoFile.getOriginalFilename());
+
             saveVideoFile(videoFile, videoFileName);
+
+            String compressedVideoFileName = "compressed_" + videoFileName;
+            File compressedFile = videoCompressionService.compressVideo(new File(uploadVideoDir + videoFileName), compressedVideoDir + compressedVideoFileName);
+
+            File originalFile = new File(uploadVideoDir + videoFileName);
+            if (originalFile.exists()) {
+                originalFile.delete();
+            }
 
             Author author = authorRepository.findByArtistName(video.getAuthor().getArtistName())
                     .orElseGet(() -> {
@@ -92,14 +111,26 @@ public class VideoService {
             Video newVideo = new Video();
             newVideo.setTitle(video.getTitle());
             newVideo.setDescription(video.getDescription());
-            newVideo.setPath(uploadVideoDir + videoFileName);
+            //newVideo.setPath(uploadVideoDir + videoFileName);
+            newVideo.setPath(compressedVideoDir + compressedVideoFileName);
             newVideo.setUser(user);
             newVideo.setAuthor(author);
             newVideo.setMimetype(videoFile.getContentType());
-            newVideo.setSize(videoFile.getSize());
+            newVideo.setSize(compressedFile.length());
             newVideo.setFeatures(features);
-            videoRepository.save(newVideo);
-            return ResponseEntity.ok(newVideo);
+            Video savedVideo = videoRepository.save(newVideo);
+
+            if(group.isEmpty()){
+                group = "Público";
+            }
+
+            ShareGroup shareGroup = groupRepository.findByGroupName(group);
+
+            ContentShareGroup contentShareGroup = new ContentShareGroup(null, savedVideo, shareGroup);
+
+            contentShareGroupRepository.save(contentShareGroup);
+
+            return ResponseEntity.ok(contentShareGroup);
 
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error while uploading video: " + e.getMessage());
@@ -124,4 +155,5 @@ public class VideoService {
         Path filePath = Paths.get(uploadVideoDir + fileName);
         Files.write(filePath, file.getBytes());
     }
+
 }
