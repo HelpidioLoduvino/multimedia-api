@@ -14,12 +14,14 @@ public class RequestToJoinGroup {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String requestStatus;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "shareGroup_id")
-    private ShareGroup shareGroup;
+    @JoinColumn(name = "userGroup_id")
+    private UserGroup userGroup;
 
 }

@@ -1,0 +1,1 @@
+drop table request_to_join_group;

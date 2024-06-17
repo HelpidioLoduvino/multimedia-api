@@ -1,7 +1,6 @@
 package com.example.multimediaapi.controller;
 
-import com.example.multimediaapi.model.ContentShareGroup;
-import com.example.multimediaapi.model.ShareGroup;
+import com.example.multimediaapi.model.*;
 import com.example.multimediaapi.service.GroupService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +18,11 @@ public class GroupController {
     @PostMapping("/create")
     public ResponseEntity<Object> createGroup(@RequestBody ShareGroup group) {
         return ResponseEntity.ok(groupService.createGroup(group));
+    }
+
+    @GetMapping("/get-group/{id}")
+    public ResponseEntity<ShareGroup> getGroup(@PathVariable long id) {
+        return ResponseEntity.ok(groupService.getGroup(id));
     }
 
     @GetMapping("/all-my-groups")
@@ -47,7 +51,7 @@ public class GroupController {
     }
 
     @GetMapping("/all-users-by-group-id/{id}")
-    public ResponseEntity<Object> getAllUsersByGroupId(@PathVariable Long id) {
+    public ResponseEntity<List<UserGroup>> getAllUsersByGroupId(@PathVariable Long id) {
         return ResponseEntity.ok(groupService.getAllUsersByGroupId(id));
     }
 
@@ -77,4 +81,42 @@ public class GroupController {
     public ResponseEntity<Object> requestToJoinGroup(@RequestParam Long groupId) {
         return ResponseEntity.ok(groupService.requestToJoinGroup(groupId));
     }
+
+    @GetMapping("/get-all-requests/{id}")
+    public ResponseEntity<List<RequestToJoinGroup>> getAllRequests(@PathVariable Long id){
+        return ResponseEntity.ok(groupService.getAllJoinRequestsByGroupId(id).getBody());
+    }
+
+    @PutMapping("/accept-request-to-join-group")
+    public ResponseEntity<Object> acceptRequest(@RequestParam Long id){
+        return ResponseEntity.ok(groupService.acceptRequestToJoinGroup(id));
+    }
+
+
+    @PutMapping("/reject-request-to-join-group")
+    public ResponseEntity<Object> rejectRequest(@RequestParam Long id){
+        return ResponseEntity.ok(groupService.rejectRequestToJoinGroup(id));
+    }
+
+    @GetMapping("/is-owner")
+    public boolean isOwner(@RequestParam Long groupId) {
+        return groupService.isOwner(groupId);
+    }
+
+    @GetMapping("/is-editor")
+    public boolean isEditor(@RequestParam Long groupId) {
+        return groupService.isEditor(groupId);
+    }
+
+    @GetMapping("/is-group-owner")
+    public boolean isGroupOwner(@RequestParam Long groupId) {
+        return groupService.isGroupOwner(groupId);
+    }
+
+    @GetMapping("/is-normal")
+    public boolean isNormal(@RequestParam Long groupId) {
+        return groupService.isNormal(groupId);
+    }
+
+
 }

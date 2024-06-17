@@ -1,0 +1,1 @@
+drop table reject_request_to_join_group;

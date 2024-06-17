@@ -9,4 +9,7 @@
         <!-- <include file="db/changelog/002-drop-table-playlist_content.sql"/> -->
         <!-- <include file="db/changelog/003-drop-table-share_group.sql"/>-->
         <!-- <include file="db/changelog/004-drop-table-album_review.sql"/> -->
+        <!-- <include file="/db/changelog/006-drop-table-accept-request-to-join-group.sql"/>
+        <include file="/db/changelog/007-drop-table-reject-request-to-join-group.sql"/>
+        <include file="/db/changelog/005-drop-table-request-to-join-group.sql"/> -->
 </databaseChangeLog>
