@@ -42,6 +42,7 @@ public class MultimediaApiApplication {
 				ShareGroup firstShareGroup = new ShareGroup();
 				firstShareGroup.setGroupName("Público");
 				firstShareGroup.setGroupStatus("Público");
+				firstShareGroup.setFirstOwner(adminUser);
 				ShareGroup shareGroup = groupRepository.save(firstShareGroup);
 				UserGroup firstUserGroup = new UserGroup(null, "Owner", true, adminUser, shareGroup);
 				userGroupRepository.save(firstUserGroup);

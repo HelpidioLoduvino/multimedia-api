@@ -18,4 +18,8 @@ public class ShareGroup {
 
     private String groupStatus;
 
+    @ManyToOne
+    @JoinColumn(name = "firstOwner_id")
+    private User firstOwner;
+
 }
