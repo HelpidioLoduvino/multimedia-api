@@ -25,7 +25,7 @@ public class GroupService {
     private final RequestToJoinGroupRepository requestToJoinGroupRepository;
     private final NotificationRepository notificationRepository;
 
-    public ResponseEntity<Object> createGroup(MyGroup myGroup) {
+    public ResponseEntity<Object> createGroup(Group myGroup) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
@@ -38,12 +38,10 @@ public class GroupService {
 
         myGroup.getMembers().add(member);
 
-        MyGroup newMyGroup = groupRepository.save(myGroup);
-
-        return ResponseEntity.ok(groupRepository.save(newMyGroup));
+        return ResponseEntity.ok(groupRepository.save(myGroup));
     }
 
-    public MyGroup getGroup(Long groupId) {
+    public Group getGroup(Long groupId) {
         return groupRepository.findById(groupId).orElse(null);
     }
 
@@ -54,7 +52,7 @@ public class GroupService {
         String email = ((UserDetails) principal).getUsername();
         User user = userRepository.findByUserEmail(email);
 
-        return ResponseEntity.ok(contentShareGroupRepository.findAllByMyGroupGroupNameAndContent_MimetypeStartingWithOrContent_UserAndContent_MimetypeStartingWith("Público", "audio", user, "audio"));
+        return ResponseEntity.ok(contentShareGroupRepository.findAllByMyGroupNameAndContent_MimetypeStartingWithOrContent_UserAndContent_MimetypeStartingWith("Público", "audio", user, "audio"));
     }
 
     public ResponseEntity<List<ContentShareGroup>> getAllVideosFromPublicGroup(){
@@ -64,7 +62,7 @@ public class GroupService {
         String email = ((UserDetails) principal).getUsername();
         User user = userRepository.findByUserEmail(email);
 
-        return ResponseEntity.ok(contentShareGroupRepository.findAllByMyGroupGroupNameAndContent_MimetypeStartingWithOrContent_UserAndContent_MimetypeStartingWith("Público", "video", user, "video"));
+        return ResponseEntity.ok(contentShareGroupRepository.findAllByMyGroupNameAndContent_MimetypeStartingWithOrContent_UserAndContent_MimetypeStartingWith("Público", "video", user, "video"));
     }
 
     public ResponseEntity<Object> getAllMyGroups(){
@@ -84,10 +82,10 @@ public class GroupService {
         String email = ((UserDetails) principal).getUsername();
         User user = userRepository.findByUserEmail(email);
         Member member = new Member(user);
-        return ResponseEntity.ok(groupRepository.findByGroupNameNotAndMembersIsNotContaining("Público", member));
+        return ResponseEntity.ok(groupRepository.findByNameNotAndMembersIsNotContaining("Público", member));
     }
 
-    public List<MyGroup> getAllGroups() {
+    public List<Group> getAllGroups() {
         return groupRepository.findAll();
     }
 
@@ -95,9 +93,9 @@ public class GroupService {
 
         Content content = contentRepository.findById(contentId).orElseThrow(() -> new RuntimeException("Content not found"));
 
-        MyGroup sg;
+        Group sg;
         if (groupId == null) {
-            sg = groupRepository.findByGroupName("Público");
+            sg = groupRepository.findByName("Público");
             if (sg == null) {
                 throw new RuntimeException("Public Group not found");
             }
@@ -116,7 +114,7 @@ public class GroupService {
         return ResponseEntity.ok(contentShareGroupRepository.findAllByMyGroup_Id(groupId));
     }
 
-    public MyGroup getAllUsersByGroupId(Long groupId) {
+    public Group getAllUsersByGroupId(Long groupId) {
         return groupRepository.findMyGroupById(groupId);
     }
 
@@ -130,7 +128,7 @@ public class GroupService {
 
         User user = userRepository.findByUserEmail(email);
 
-        MyGroup myGroup = groupRepository.findMyGroupById(groupId);
+        Group myGroup = groupRepository.findMyGroupById(groupId);
 
         if(myGroup == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -150,6 +148,7 @@ public class GroupService {
         notification.setSender(user);
         notification.setMyGroup(myGroup);
         notification.setOpened(false);
+        notification.setRecipient(null);
         notification.setMessage("Deseja fazer parte do grupo");
 
         notificationRepository.save(notification);
@@ -164,6 +163,13 @@ public class GroupService {
     @Transactional
     public ResponseEntity<Object> acceptRequestToJoinGroup(Long requestId) {
 
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
+        Object principal = auth.getPrincipal();
+        String email = ((UserDetails) principal).getUsername();
+
+        User user = userRepository.findByUserEmail(email);
+
         RequestToJoinGroup requestToJoinGroup = requestToJoinGroupRepository.findById(requestId).orElse(null);
 
         if(requestToJoinGroup == null){
@@ -172,24 +178,24 @@ public class GroupService {
 
         requestToJoinGroup.setRequestStatus("ACCEPTED");
 
-        MyGroup group = requestToJoinGroup.getGroup();
+        Group group = requestToJoinGroup.getGroup();
+
         Member member = new Member(false, false, requestToJoinGroup.getUser());
+
         group.getMembers().add(member);
+
         groupRepository.save(group);
 
         requestToJoinGroupRepository.save(requestToJoinGroup);
 
-        /*
         Notification notification = new Notification();
-        notification.setSender(requestToJoinGroup.getUser());
-        //notification.setRecipient(recipients);
-        notification.setShareGroup(requestToJoinGroup.getUserGroup().getShareGroup());
+        notification.setSender(user);
+        notification.setRecipient(requestToJoinGroup.getUser());
+        notification.setMyGroup(group);
         notification.setOpened(false);
         notification.setMessage("Deseja que vc faça parte do grupo");
 
         notificationRepository.save(notification);
-
-         */
 
         return ResponseEntity.ok(requestToJoinGroup);
     }
@@ -213,7 +219,7 @@ public class GroupService {
 
         Member member = new Member(user);
 
-        MyGroup group = groupRepository.findByMembersContainingAndId(member, groupId);
+        Group group = groupRepository.findByMembersContainingAndId(member, groupId);
 
         if(group == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -234,7 +240,7 @@ public class GroupService {
 
         Member member = new Member(user);
 
-        MyGroup group = groupRepository.findByMembersContainingAndId(member, groupId);
+        Group group = groupRepository.findByMembersContainingAndId(member, groupId);
 
         if(group == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

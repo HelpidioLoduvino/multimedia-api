@@ -9,6 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface BandRepository extends JpaRepository<Band, Long> {
-    Optional<Band> findByBandName(String name);
+    Optional<Band> findByName(String name);
     List<Band> findAllByUserId(Long userId);
 }

@@ -20,6 +20,6 @@ public class RequestToJoinGroup {
     private User user;
 
     @ManyToOne
-    private MyGroup group;
+    private Group group;
 
 }

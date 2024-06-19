@@ -57,21 +57,21 @@ public class VideoService {
                 originalFile.delete();
             }
 
-            Author author = authorRepository.findByArtistName(video.getAuthor().getArtistName())
+            Author author = authorRepository.findByName(video.getAuthor().getName())
                     .orElseGet(() -> {
                         Author newAuthor = new Author();
-                        Label label = labelRepository.findByLabelName(video.getAuthor().getLabel().getLabelName()).orElse(null);
+                        Label label = labelRepository.findByName(video.getAuthor().getLabel().getName()).orElse(null);
                         if(label == null) {
                             label = new Label();
-                            label.setLabelName(video.getAuthor().getLabel().getLabelName());
+                            label.setName(video.getAuthor().getLabel().getName());
                             label = labelRepository.save(label);
                         }
                         Band band = null;
                         if (video.getAuthor().getBand() != null) {
-                            band = bandRepository.findByBandName(video.getAuthor().getBand().getBandName()).orElse(null);
+                            band = bandRepository.findByName(video.getAuthor().getBand().getName()).orElse(null);
                             if (band == null) {
                                 band = new Band();
-                                band.setBandName(video.getAuthor().getBand().getBandName());
+                                band.setName(video.getAuthor().getBand().getName());
                                 band.setHistory(video.getAuthor().getBand().getHistory());
                                 band.setStart(video.getAuthor().getBand().getStart());
                                 band.setEnd(video.getAuthor().getBand().getEnd());
@@ -83,7 +83,7 @@ public class VideoService {
                                 }
                             }
                         }
-                        newAuthor.setArtistName(video.getAuthor().getArtistName());
+                        newAuthor.setName(video.getAuthor().getName());
                         newAuthor.setLabel(label);
                         newAuthor.setBand(band);
                         newAuthor = authorRepository.save(newAuthor);
@@ -91,10 +91,10 @@ public class VideoService {
                     });
             List<Feature> features = video.getFeatures().stream()
                     .map(featureDto -> {
-                        Feature newFeature = featureRepository.findByArtistName(featureDto.getArtistName()).orElse(null);
+                        Feature newFeature = featureRepository.findByName(featureDto.getName()).orElse(null);
                         if (newFeature == null) {
                             newFeature = new Feature();
-                            newFeature.setArtistName(featureDto.getArtistName());
+                            newFeature.setName(featureDto.getName());
                             newFeature = featureRepository.save(newFeature);
                         }
                         return newFeature;
@@ -116,7 +116,7 @@ public class VideoService {
                 group = "Público";
             }
 
-            MyGroup myGroup = groupRepository.findByGroupName(group);
+            Group myGroup = groupRepository.findByName(group);
 
             ContentShareGroup contentShareGroup = new ContentShareGroup(null, savedVideo, myGroup);
 

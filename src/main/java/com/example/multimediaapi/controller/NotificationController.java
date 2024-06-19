@@ -1,7 +1,6 @@
 package com.example.multimediaapi.controller;
 
 import com.example.multimediaapi.model.Notification;
-import com.example.multimediaapi.repository.NotificationRepository;
 import com.example.multimediaapi.service.NotificationService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;

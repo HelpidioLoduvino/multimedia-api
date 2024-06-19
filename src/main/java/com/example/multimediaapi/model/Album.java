@@ -17,6 +17,5 @@ public class Album extends MusicRelease{
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
     private User user;
 }

@@ -16,12 +16,12 @@ public class GroupController {
     private final GroupService groupService;
 
     @PostMapping("/create")
-    public ResponseEntity<Object> createGroup(@RequestBody MyGroup group) {
+    public ResponseEntity<Object> createGroup(@RequestBody Group group) {
         return ResponseEntity.ok(groupService.createGroup(group));
     }
 
     @GetMapping("/get-group/{id}")
-    public ResponseEntity<MyGroup> getGroup(@PathVariable long id) {
+    public ResponseEntity<Group> getGroup(@PathVariable long id) {
         return ResponseEntity.ok(groupService.getGroup(id));
     }
 
@@ -51,7 +51,7 @@ public class GroupController {
     }
 
     @GetMapping("/all-users-by-group-id/{id}")
-    public ResponseEntity<MyGroup> getAllUsersByGroupId(@PathVariable Long id) {
+    public ResponseEntity<Group> getAllUsersByGroupId(@PathVariable Long id) {
         return ResponseEntity.ok(groupService.getAllUsersByGroupId(id));
     }
 

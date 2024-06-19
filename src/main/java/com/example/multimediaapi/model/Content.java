@@ -26,19 +26,12 @@ public class Content {
     private long size;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "author_id")
     private Author author;
 
     @ManyToMany
-    @JoinTable(
-            name = "content_feature",
-            joinColumns = @JoinColumn(name = "content_id"),
-            inverseJoinColumns = @JoinColumn(name = "feature_id ")
-    )
     private List<Feature> features;
 
 }

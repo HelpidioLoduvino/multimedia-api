@@ -18,7 +18,10 @@ public class Notification {
     private User sender;
 
     @ManyToOne
-    private MyGroup myGroup;
+    private Group myGroup;
+
+    @ManyToOne
+    private User recipient;
 
     private String message;
 

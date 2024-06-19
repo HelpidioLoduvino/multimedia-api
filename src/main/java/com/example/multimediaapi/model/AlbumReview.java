@@ -23,11 +23,9 @@ public class AlbumReview {
     private String overview;
 
     @ManyToOne
-    @JoinColumn(name = "album_id")
     private MusicRelease musicRelease;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
     private User user;
 
 }

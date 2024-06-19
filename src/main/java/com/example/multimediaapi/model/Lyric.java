@@ -14,9 +14,4 @@ public class Lyric {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String content;
-    /*
-    @OneToOne(mappedBy = "lyric")
-    private Music music;
-
-     */
 }

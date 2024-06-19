@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface SongWriterRepository extends JpaRepository<SongWriter, Long> {
-    Optional<SongWriter> findByArtistName(String songwriterName);
+    Optional<SongWriter> findByName(String songwriterName);
 }

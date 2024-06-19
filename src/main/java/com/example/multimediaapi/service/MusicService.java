@@ -80,21 +80,21 @@ public class MusicService {
                         return newRelease;
                     });
 
-            Author author = authorRepository.findByArtistName(music.getAuthor().getArtistName())
+            Author author = authorRepository.findByName(music.getAuthor().getName())
                     .orElseGet(() -> {
                         Author newAuthor = new Author();
-                        Label label = labelRepository.findByLabelName(music.getAuthor().getLabel().getLabelName()).orElse(null);
+                        Label label = labelRepository.findByName(music.getAuthor().getLabel().getName()).orElse(null);
                         if(label == null) {
                              label = new Label();
-                             label.setLabelName(music.getAuthor().getLabel().getLabelName());
+                             label.setName(music.getAuthor().getLabel().getName());
                              label = labelRepository.save(label);
                         }
                         Band band = null;
                         if (music.getAuthor().getBand() != null) {
-                            band = bandRepository.findByBandName(music.getAuthor().getBand().getBandName()).orElse(null);
+                            band = bandRepository.findByName(music.getAuthor().getBand().getName()).orElse(null);
                             if (band == null) {
                                 band = new Band();
-                                band.setBandName(music.getAuthor().getBand().getBandName());
+                                band.setName(music.getAuthor().getBand().getName());
                                 band.setHistory(music.getAuthor().getBand().getHistory());
                                 band.setStart(music.getAuthor().getBand().getStart());
                                 band.setEnd(music.getAuthor().getBand().getEnd());
@@ -106,7 +106,7 @@ public class MusicService {
                                 }
                             }
                         }
-                        newAuthor.setArtistName(music.getAuthor().getArtistName());
+                        newAuthor.setName(music.getAuthor().getName());
                         newAuthor.setLabel(label);
                         newAuthor.setBand(band);
                         newAuthor = authorRepository.save(newAuthor);
@@ -115,10 +115,10 @@ public class MusicService {
 
             List<Feature> features = music.getFeatures().stream()
                     .map(featureDto -> {
-                        Feature newFeature = featureRepository.findByArtistName(featureDto.getArtistName()).orElse(null);
+                        Feature newFeature = featureRepository.findByName(featureDto.getName()).orElse(null);
                         if(newFeature == null){
                             newFeature = new Feature();
-                            newFeature.setArtistName(featureDto.getArtistName());
+                            newFeature.setName(featureDto.getName());
                             newFeature = featureRepository.save(newFeature);
                         }
                         return newFeature;
@@ -126,10 +126,10 @@ public class MusicService {
 
             List<SongWriter> songWriters = music.getSongwriters().stream()
                     .map(songWriterDto -> {
-                        SongWriter songWriter = songWriterRepository.findByArtistName(songWriterDto.getArtistName()).orElse(null);
+                        SongWriter songWriter = songWriterRepository.findByName(songWriterDto.getName()).orElse(null);
                         if (songWriter == null){
                             songWriter = new SongWriter();
-                            songWriter.setArtistName(songWriterDto.getArtistName());
+                            songWriter.setName(songWriterDto.getName());
                             songWriter = songWriterRepository.save(songWriter);
                         }
                         return songWriter;
@@ -153,7 +153,7 @@ public class MusicService {
                 group = "Público";
             }
 
-            MyGroup myGroup = groupRepository.findByGroupName(group);
+            Group myGroup = groupRepository.findByName(group);
 
             ContentShareGroup contentShareGroup = new ContentShareGroup(null, savedMusic, myGroup);
 

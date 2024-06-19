@@ -1,7 +1,7 @@
 package com.example.multimediaapi;
 
 import com.example.multimediaapi.model.Member;
-import com.example.multimediaapi.model.MyGroup;
+import com.example.multimediaapi.model.Group;
 import com.example.multimediaapi.model.User;
 import com.example.multimediaapi.repository.GroupRepository;
 import com.example.multimediaapi.repository.UserRepository;
@@ -34,13 +34,13 @@ public class MultimediaApiApplication {
 				userRepository.save(adminUser);
 			}
 
-			boolean groupExists = groupRepository.existsByGroupName("Público");
+			boolean groupExists = groupRepository.existsByName("Público");
 
 			if (!groupExists) {
-				MyGroup firstMyGroup = new MyGroup();
+				Group firstMyGroup = new Group();
 				Member member = new Member(true, true, adminUser);
-				firstMyGroup.setGroupName("Público");
-				firstMyGroup.setGroupStatus("Público");
+				firstMyGroup.setName("Público");
+				firstMyGroup.setStatus("Público");
 				firstMyGroup.getMembers().add(member);
 				groupRepository.save(firstMyGroup);
 			}

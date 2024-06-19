@@ -1,25 +1,15 @@
 package com.example.multimediaapi.controller;
 
 import com.example.multimediaapi.model.Content;
-import com.example.multimediaapi.repository.ContentRepository;
 import com.example.multimediaapi.service.ContentService;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import org.springframework.core.io.support.ResourceRegion;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpRange;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import java.io.File;
-import java.io.FileInputStream;
+
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 @RestController
@@ -28,7 +18,6 @@ import java.util.List;
 public class ContentController {
 
     private final ContentService contentService;
-    private final ContentRepository contentRepository;
 
     @GetMapping("/all")
     public ResponseEntity<List<Content>> getAll() {

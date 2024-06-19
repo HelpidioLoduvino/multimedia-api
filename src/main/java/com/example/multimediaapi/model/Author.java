@@ -17,10 +17,8 @@ public class Author extends Artist{
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "label_id")
     private Label label;
 
     @ManyToOne
-    @JoinColumn(name = "band_id")
     private Band band;
 }

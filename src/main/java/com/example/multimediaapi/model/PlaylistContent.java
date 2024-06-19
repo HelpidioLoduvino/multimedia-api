@@ -18,11 +18,9 @@ public class PlaylistContent {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "playlist_id")
     private Playlist playlist;
 
     @ManyToOne
-    @JoinColumn(name = "content_id")
     private Content content;
 
 }

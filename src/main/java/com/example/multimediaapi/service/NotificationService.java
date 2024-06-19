@@ -45,7 +45,7 @@ public class NotificationService {
 
         Member member = new Member(true,true, user);
 
-        return notificationRepository.findAllByMyGroup_MembersIsContainingAndOpened(member, false);
+        return notificationRepository.findAllByMyGroup_MembersIsContainingAndOpenedOrRecipientAndOpened(member, false, user, false);
     }
 
     private void markNotificationsAsRead(List<Notification> notifications) {

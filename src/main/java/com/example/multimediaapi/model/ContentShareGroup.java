@@ -15,11 +15,9 @@ public class ContentShareGroup {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "content_id")
     private Content content;
 
     @ManyToOne
-    @JoinColumn(name = "shareGroup_id")
-    private MyGroup myGroup;
+    private Group myGroup;
 
 }
