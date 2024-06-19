@@ -1,11 +1,11 @@
 package com.example.multimediaapi.service;
 
+import com.example.multimediaapi.model.Member;
 import com.example.multimediaapi.model.Notification;
 import com.example.multimediaapi.model.User;
 import com.example.multimediaapi.repository.NotificationRepository;
 import com.example.multimediaapi.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,9 +42,10 @@ public class NotificationService {
         String email = ((UserDetails) principal).getUsername();
 
         User user = userRepository.findByUserEmail(email);
-        Long userId = user.getId();
 
-        return notificationRepository.findAllByRecipientIdAndOpened(userId, false);
+        Member member = new Member(true,true, user);
+
+        return notificationRepository.findAllByMyGroup_MembersIsContainingAndOpened(member, false);
     }
 
     private void markNotificationsAsRead(List<Notification> notifications) {

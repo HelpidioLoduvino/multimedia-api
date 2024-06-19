@@ -1,7 +1,7 @@
 package com.example.multimediaapi.dto;
 
 import com.example.multimediaapi.model.Music;
-import com.example.multimediaapi.model.ShareGroup;
+import com.example.multimediaapi.model.MyGroup;
 
-public record ContentGroupDTO(Music music, ShareGroup group) {
+public record ContentGroupDTO(Music music, MyGroup group) {
 }

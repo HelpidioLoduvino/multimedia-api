@@ -22,7 +22,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -154,9 +153,9 @@ public class MusicService {
                 group = "Público";
             }
 
-            ShareGroup shareGroup = groupRepository.findByGroupName(group);
+            MyGroup myGroup = groupRepository.findByGroupName(group);
 
-            ContentShareGroup contentShareGroup = new ContentShareGroup(null, savedMusic, shareGroup);
+            ContentShareGroup contentShareGroup = new ContentShareGroup(null, savedMusic, myGroup);
 
             contentShareGroupRepository.save(contentShareGroup);
 

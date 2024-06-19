@@ -17,11 +17,9 @@ public class RequestToJoinGroup {
     private String requestStatus;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "userGroup_id")
-    private UserGroup userGroup;
+    private MyGroup group;
 
 }

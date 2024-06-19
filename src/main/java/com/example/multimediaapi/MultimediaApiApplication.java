@@ -1,16 +1,14 @@
 package com.example.multimediaapi;
 
-import com.example.multimediaapi.model.ShareGroup;
+import com.example.multimediaapi.model.Member;
+import com.example.multimediaapi.model.MyGroup;
 import com.example.multimediaapi.model.User;
-import com.example.multimediaapi.model.UserGroup;
 import com.example.multimediaapi.repository.GroupRepository;
-import com.example.multimediaapi.repository.UserGroupRepository;
 import com.example.multimediaapi.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootApplication
 public class MultimediaApiApplication {
@@ -21,7 +19,7 @@ public class MultimediaApiApplication {
 
 
 	@Bean
-	CommandLineRunner initDatabase(UserRepository userRepository, GroupRepository groupRepository, UserGroupRepository userGroupRepository) {
+	CommandLineRunner initDatabase(UserRepository userRepository, GroupRepository groupRepository) {
 		return args -> {
 			User adminUser = userRepository.findByUserRole("ADMIN");
 
@@ -39,13 +37,12 @@ public class MultimediaApiApplication {
 			boolean groupExists = groupRepository.existsByGroupName("Público");
 
 			if (!groupExists) {
-				ShareGroup firstShareGroup = new ShareGroup();
-				firstShareGroup.setGroupName("Público");
-				firstShareGroup.setGroupStatus("Público");
-				firstShareGroup.setFirstOwner(adminUser);
-				ShareGroup shareGroup = groupRepository.save(firstShareGroup);
-				UserGroup firstUserGroup = new UserGroup(null, "Owner", true, adminUser, shareGroup);
-				userGroupRepository.save(firstUserGroup);
+				MyGroup firstMyGroup = new MyGroup();
+				Member member = new Member(true, true, adminUser);
+				firstMyGroup.setGroupName("Público");
+				firstMyGroup.setGroupStatus("Público");
+				firstMyGroup.getMembers().add(member);
+				groupRepository.save(firstMyGroup);
 			}
 		};
 	}

@@ -16,12 +16,12 @@ public class GroupController {
     private final GroupService groupService;
 
     @PostMapping("/create")
-    public ResponseEntity<Object> createGroup(@RequestBody ShareGroup group) {
+    public ResponseEntity<Object> createGroup(@RequestBody MyGroup group) {
         return ResponseEntity.ok(groupService.createGroup(group));
     }
 
     @GetMapping("/get-group/{id}")
-    public ResponseEntity<ShareGroup> getGroup(@PathVariable long id) {
+    public ResponseEntity<MyGroup> getGroup(@PathVariable long id) {
         return ResponseEntity.ok(groupService.getGroup(id));
     }
 
@@ -51,7 +51,7 @@ public class GroupController {
     }
 
     @GetMapping("/all-users-by-group-id/{id}")
-    public ResponseEntity<List<UserGroup>> getAllUsersByGroupId(@PathVariable Long id) {
+    public ResponseEntity<MyGroup> getAllUsersByGroupId(@PathVariable Long id) {
         return ResponseEntity.ok(groupService.getAllUsersByGroupId(id));
     }
 
@@ -97,26 +97,5 @@ public class GroupController {
     public ResponseEntity<Object> rejectRequest(@RequestParam Long id){
         return ResponseEntity.ok(groupService.rejectRequestToJoinGroup(id));
     }
-
-    @GetMapping("/is-owner")
-    public boolean isOwner(@RequestParam Long groupId) {
-        return groupService.isOwner(groupId);
-    }
-
-    @GetMapping("/is-editor")
-    public boolean isEditor(@RequestParam Long groupId) {
-        return groupService.isEditor(groupId);
-    }
-
-    @GetMapping("/is-group-owner")
-    public boolean isGroupOwner(@RequestParam Long groupId) {
-        return groupService.isGroupOwner(groupId);
-    }
-
-    @GetMapping("/is-normal")
-    public boolean isNormal(@RequestParam Long groupId) {
-        return groupService.isNormal(groupId);
-    }
-
 
 }

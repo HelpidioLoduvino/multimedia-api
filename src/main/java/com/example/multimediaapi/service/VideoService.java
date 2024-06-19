@@ -2,12 +2,7 @@ package com.example.multimediaapi.service;
 
 import com.example.multimediaapi.model.*;
 import com.example.multimediaapi.repository.*;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,15 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import org.apache.commons.io.FileUtils;
 
 @Service
 @AllArgsConstructor
@@ -124,9 +116,9 @@ public class VideoService {
                 group = "Público";
             }
 
-            ShareGroup shareGroup = groupRepository.findByGroupName(group);
+            MyGroup myGroup = groupRepository.findByGroupName(group);
 
-            ContentShareGroup contentShareGroup = new ContentShareGroup(null, savedVideo, shareGroup);
+            ContentShareGroup contentShareGroup = new ContentShareGroup(null, savedVideo, myGroup);
 
             contentShareGroupRepository.save(contentShareGroup);
 

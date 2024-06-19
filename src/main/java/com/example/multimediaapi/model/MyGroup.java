@@ -5,24 +5,23 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserGroup {
+public class MyGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String userStatus;
+    private String groupName;
 
-    private boolean isEditor;
+    private String groupStatus;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @ElementCollection
+    private List<Member> members = new ArrayList<>();
 
-    @ManyToOne
-    @JoinColumn(name = "shareGroup_id")
-    private ShareGroup shareGroup;
 }

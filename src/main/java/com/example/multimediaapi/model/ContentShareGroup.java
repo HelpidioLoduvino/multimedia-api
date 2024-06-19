@@ -20,6 +20,6 @@ public class ContentShareGroup {
 
     @ManyToOne
     @JoinColumn(name = "shareGroup_id")
-    private ShareGroup shareGroup;
+    private MyGroup myGroup;
 
 }
