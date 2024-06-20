@@ -53,6 +53,10 @@ public class PlaylistService {
         }
     }
 
+    public Playlist getPlaylist(Long playlistId){
+        return playListRepository.findById(playlistId).orElse(null);
+    }
+
     public List<Playlist> getAllPlaylists(){
         return playListRepository.findAll();
     }

@@ -20,6 +20,11 @@ public class PlaylistController {
         return ResponseEntity.ok(playlistService.addPlaylist(playlist, contentIds).getBody());
     }
 
+    @GetMapping("playlist/{id}")
+    public ResponseEntity<Playlist> getPlaylist(@PathVariable Long id){
+        return ResponseEntity.ok(playlistService.getPlaylist(id));
+    }
+
     @GetMapping("/all")
     public ResponseEntity<Object> getAllPlaylists(){
         return ResponseEntity.ok(playlistService.getAllPlaylists());
