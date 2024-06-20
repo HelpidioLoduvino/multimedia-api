@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/playlist")
 @AllArgsConstructor
@@ -14,14 +16,15 @@ public class PlaylistController {
     private PlaylistService playlistService;
 
     @PostMapping("/add")
-    public ResponseEntity<Object> addPlaylist(@RequestBody Playlist playlist){
-        return ResponseEntity.ok(playlistService.addPlaylist(playlist));
+    public ResponseEntity<Playlist> addPlaylist(@RequestBody Playlist playlist, @RequestParam List<Long> contentIds){
+        return ResponseEntity.ok(playlistService.addPlaylist(playlist, contentIds).getBody());
     }
 
     @GetMapping("/all")
     public ResponseEntity<Object> getAllPlaylists(){
         return ResponseEntity.ok(playlistService.getAllPlaylists());
     }
+
 
     @GetMapping("/user-playlists")
     public ResponseEntity<Object> getPlaylistById(){
@@ -33,25 +36,11 @@ public class PlaylistController {
         return ResponseEntity.ok(playlistService.getAllPublicPlaylists());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Object> getPlaylistById(@PathVariable Long id){
-        return ResponseEntity.ok(playlistService.getAllPlaylistContentByPlaylistId(id));
-    }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deletePlaylist(@PathVariable Long id){
         playlistService.deletePlaylist(id);
         return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("/add-content-to-playlist")
-    public ResponseEntity<Object> addPlaylistContent(@RequestBody ContentPlaylistDto contentToPlaylistDto){
-        return ResponseEntity.ok(playlistService.addContentToPlaylist(contentToPlaylistDto));
-    }
-
-    @GetMapping("/all-playlist-content")
-    public ResponseEntity<Object> getAllPlaylistContent(){
-        return ResponseEntity.ok(playlistService.getAllPlaylistContents());
     }
 
 }
