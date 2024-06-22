@@ -25,7 +25,6 @@ public class PlaylistService {
     private final ContentRepository contentRepository;
 
     public ResponseEntity<Playlist> addPlaylist(Playlist playList, List<Long> contentIds){
-        System.out.println("Content Id : " + contentIds);
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
@@ -42,13 +41,15 @@ public class PlaylistService {
                     .collect(Collectors.toList());
 
             playList.setContents(contents);
+            if(playList.getStatus().isEmpty()){
+                playList.setStatus("Público");
+            }
 
             playListRepository.save(playList);
 
             return ResponseEntity.ok().build();
 
         }catch (Exception e){
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
@@ -78,6 +79,32 @@ public class PlaylistService {
         User user = userRepository.findByUserEmail(email);
         Long userId = user.getId();
         return ResponseEntity.ok(playListRepository.findAllPublicPlaylistsWithDifferentUserId(userId));
+    }
+
+    public void addContentToPlaylist(Long contentId, List<Long> playlistIds){
+
+        Content content = contentRepository.findById(contentId).orElse(null);
+
+        if (content == null) {
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body("Content not found");
+            return;
+        }
+
+        List<Playlist> playlists = playlistIds.stream()
+                .map(playlistId -> playListRepository.findById(playlistId).orElse(null))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        if (playlists.isEmpty()) {
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body("No playlists found");
+            return;
+        }
+
+        for(Playlist playlist: playlists){
+            playlist.getContents().add(content);
+            playListRepository.save(playlist);
+        }
+
     }
 
     public void deletePlaylist(Long id){

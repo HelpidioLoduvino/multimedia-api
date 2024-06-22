@@ -48,4 +48,10 @@ public class PlaylistController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/add-content-to-playlist")
+    public ResponseEntity<Object> addContentToPlaylist(@RequestParam Long contentId, @RequestParam List<Long> playlistIds){
+        playlistService.addContentToPlaylist(contentId, playlistIds);
+        return ResponseEntity.ok().build();
+    }
+
 }
