@@ -36,7 +36,6 @@ public class MusicService {
     private final AuthorRepository authorRepository;
     private final CategoryRepository categoryRepository;
     private final GroupRepository groupRepository;
-    private final ContentShareGroupRepository contentShareGroupRepository;
     private final SongWriterRepository songWriterRepository;
     private final MusicReleaseRepository musicReleaseRepository;
     private final LabelRepository labelRepository;
@@ -155,11 +154,12 @@ public class MusicService {
 
             Group myGroup = groupRepository.findByName(group);
 
-            ContentShareGroup contentShareGroup = new ContentShareGroup(null, savedMusic, myGroup);
+            myGroup.getContents().add(savedMusic);
 
-            contentShareGroupRepository.save(contentShareGroup);
+            groupRepository.save(myGroup);
 
-            return ResponseEntity.ok(contentShareGroup);
+            return ResponseEntity.ok(myGroup);
+
         }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error while uploading music: " + e.getMessage());
         }

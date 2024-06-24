@@ -25,6 +25,11 @@ public class GroupController {
         return ResponseEntity.ok(groupService.getGroup(id));
     }
 
+    @GetMapping("/get-public-group")
+    public ResponseEntity<Group> getPublicGroup() {
+        return ResponseEntity.ok(groupService.getPublicGroup());
+    }
+
     @GetMapping("/all-my-groups")
     public ResponseEntity<Object> getAllMyGroups() {
         return ResponseEntity.ok(groupService.getAllMyGroups());
@@ -40,31 +45,9 @@ public class GroupController {
         return ResponseEntity.ok(groupService.getAllGroups());
     }
 
-    @PostMapping("/add-content-to-group")
-    public ResponseEntity<Object> addContentToGroup(@RequestParam Long contentId, @RequestParam Long groupId) {
-        return ResponseEntity.ok(groupService.addContentToSelectedGroup(contentId, groupId));
-    }
-
-    @GetMapping("/all-contents-by-group-id/{id}")
-    public ResponseEntity<Object> getAllContentsByGroupId(@PathVariable Long id) {
-        return ResponseEntity.ok(groupService.getAllContentsByGroupId(id));
-    }
-
     @GetMapping("/all-users-by-group-id/{id}")
     public ResponseEntity<Group> getAllUsersByGroupId(@PathVariable Long id) {
         return ResponseEntity.ok(groupService.getAllUsersByGroupId(id));
-    }
-
-    @GetMapping("/all-musics-from-public-group")
-    public ResponseEntity<List<ContentShareGroup>> getAllMusicsFromPublicGroup() {
-        ResponseEntity<List<ContentShareGroup>> response = groupService.getAllMusicsFromPublicGroup();
-        return ResponseEntity.ok(response.getBody());
-    }
-
-    @GetMapping("/all-videos-from-public-group")
-    public ResponseEntity<List<ContentShareGroup>> getAllVideosFromPublicGroup() {
-        ResponseEntity<List<ContentShareGroup>> response = groupService.getAllVideosFromPublicGroup();
-        return ResponseEntity.ok(response.getBody());
     }
 
     @PutMapping("/update-user-to-owner")
@@ -96,6 +79,17 @@ public class GroupController {
     @PutMapping("/reject-request-to-join-group")
     public ResponseEntity<Object> rejectRequest(@RequestParam Long id){
         return ResponseEntity.ok(groupService.rejectRequestToJoinGroup(id));
+    }
+
+    @PostMapping("/add-content-to-group")
+    public ResponseEntity<Object> addContentToGroup(@RequestParam Long contentId, @RequestParam List<Long> groupId) {
+        groupService.addContentToGroup(contentId, groupId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/get-all-my-friends")
+    public ResponseEntity<List<Group>> getAllMyFriends() {
+        return ResponseEntity.ok(groupService.getAllMyFriends().getBody());
     }
 
 }

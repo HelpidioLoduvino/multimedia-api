@@ -30,11 +30,6 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    @GetMapping("/clients")
-    public ResponseEntity<Object> getClients() {
-        return ResponseEntity.ok(userService.getUsersByRoleClient());
-    }
-
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteUser(@PathVariable Long id) {
         return ResponseEntity.ok(userService.deleteUser(id));
@@ -43,6 +38,11 @@ public class UserController {
     @PostMapping("/refresh")
     public ResponseEntity<Object> refresh(@RequestBody TokenRefreshRequest request) {
         return ResponseEntity.ok(userService.refresh(request));
+    }
+
+    @GetMapping("/get-all-clients")
+    public ResponseEntity<Object> getUsersByClientRole() {
+        return ResponseEntity.ok(userService.getAllUsersByClientRole());
     }
 
 }

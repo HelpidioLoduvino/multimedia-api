@@ -17,4 +17,5 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
     List<Group> findAllById(Long shareGroupId);
     Group findByMembersContainingAndId(Member members, Long id);
     List<Group> findAllByMembersContainingAndId(Member userStatus, Long shareGroup_id);
+    List<Group> findAllByMembersIsContainingAndMembersIsNotContaining(Member user, Member member);
 }

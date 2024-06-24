@@ -91,13 +91,19 @@ public class UserService implements UserDetailsService {
         return userRepository.findAllUsers();
     }
 
-    public List<UserDto> getUsersByRoleClient() {
-        return userRepository.findAllUsersByRoleClient();
-    }
-
     public ResponseEntity<Object> deleteUser(Long id) {
         userRepository.deleteById(id);
         return ResponseEntity.ok().build();
+    }
+
+    public List<User> getAllUsersByClientRole(){
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = auth.getPrincipal();
+        String email = ((UserDetails) principal).getUsername();
+        User user = userRepository.findByUserEmail(email);
+        Long id = user.getId();
+        return userRepository.findAllByUserRoleAndIdNot("CLIENT", id);
     }
 
 }

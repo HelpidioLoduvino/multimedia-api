@@ -11,8 +11,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -20,7 +20,6 @@ public class GroupService {
 
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
-    private final ContentShareGroupRepository contentShareGroupRepository;
     private final ContentRepository contentRepository;
     private final RequestToJoinGroupRepository requestToJoinGroupRepository;
     private final NotificationRepository notificationRepository;
@@ -45,24 +44,8 @@ public class GroupService {
         return groupRepository.findById(groupId).orElse(null);
     }
 
-    public ResponseEntity<List<ContentShareGroup>> getAllMusicsFromPublicGroup(){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
-        Object principal = auth.getPrincipal();
-        String email = ((UserDetails) principal).getUsername();
-        User user = userRepository.findByUserEmail(email);
-
-        return ResponseEntity.ok(contentShareGroupRepository.findAllByMyGroupNameAndContent_MimetypeStartingWithOrContent_UserAndContent_MimetypeStartingWith("Público", "audio", user, "audio"));
-    }
-
-    public ResponseEntity<List<ContentShareGroup>> getAllVideosFromPublicGroup(){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
-        Object principal = auth.getPrincipal();
-        String email = ((UserDetails) principal).getUsername();
-        User user = userRepository.findByUserEmail(email);
-
-        return ResponseEntity.ok(contentShareGroupRepository.findAllByMyGroupNameAndContent_MimetypeStartingWithOrContent_UserAndContent_MimetypeStartingWith("Público", "video", user, "video"));
+    public Group getPublicGroup() {
+        return groupRepository.findByName("Público");
     }
 
     public ResponseEntity<Object> getAllMyGroups(){
@@ -87,31 +70,6 @@ public class GroupService {
 
     public List<Group> getAllGroups() {
         return groupRepository.findAll();
-    }
-
-    public ResponseEntity<Object> addContentToSelectedGroup(Long contentId, Long groupId) {
-
-        Content content = contentRepository.findById(contentId).orElseThrow(() -> new RuntimeException("Content not found"));
-
-        Group sg;
-        if (groupId == null) {
-            sg = groupRepository.findByName("Público");
-            if (sg == null) {
-                throw new RuntimeException("Public Group not found");
-            }
-        } else {
-            sg = groupRepository.findById(groupId)
-                    .orElseThrow(() -> new RuntimeException("Group not found"));
-        }
-
-        ContentShareGroup contentShareGroup = new ContentShareGroup(null, content, sg);
-
-        return ResponseEntity.ok(contentShareGroupRepository.save(contentShareGroup));
-
-    }
-
-    public ResponseEntity<Object> getAllContentsByGroupId(Long groupId) {
-        return ResponseEntity.ok(contentShareGroupRepository.findAllByMyGroup_Id(groupId));
     }
 
     public Group getAllUsersByGroupId(Long groupId) {
@@ -164,7 +122,9 @@ public class GroupService {
     public ResponseEntity<Object> acceptRequestToJoinGroup(Long requestId) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
+        if (auth == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         Object principal = auth.getPrincipal();
         String email = ((UserDetails) principal).getUsername();
 
@@ -253,6 +213,52 @@ public class GroupService {
         group.getMembers().add(newMember);
 
         return ResponseEntity.ok(groupRepository.save(group));
+    }
+
+    public void addContentToGroup(Long contentId, List<Long> groupId){
+
+        Content content = contentRepository.findById(contentId).orElse(null);
+
+        List<Group> groups = groupId.stream()
+                .map(id -> groupRepository.findById(id).orElse(null))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        for(Group group : groups){
+            group.getContents().add(content);
+            groupRepository.save(group);
+        }
+
+    }
+
+    public ResponseEntity<List<Group>> getAllMyFriends(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
+        Object principal = auth.getPrincipal();
+        String email = ((UserDetails) principal).getUsername();
+        User user = userRepository.findByUserEmail(email);
+        Member member = new Member(true, true, user);
+
+        List<Group> groups = groupRepository.findAllByMembersIsContaining(member);
+
+        Set<String> uniqueMemberNames = new HashSet<>();
+
+        List<Group> groupsWithoutCreatorAndUniqueNames = groups.stream()
+                .map(group -> {
+                    if (!group.getMembers().isEmpty()) {
+                        List<Member> membersWithoutCreator = group.getMembers().stream()
+                                .skip(1)
+                                .filter(m -> uniqueMemberNames.add(m.getUser().getName()))
+                                .collect(Collectors.toList());
+                        return new Group(group.getId(), group.getName(), group.getStatus(), membersWithoutCreator, group.getContents());
+                    } else {
+                        return group;
+                    }
+                })
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(groupsWithoutCreatorAndUniqueNames);
+
     }
 
 }

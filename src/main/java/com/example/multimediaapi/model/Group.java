@@ -25,5 +25,8 @@ public class Group {
     @ElementCollection
     private List<Member> members = new ArrayList<>();
 
+    @ManyToMany
+    private List<Content> contents = new ArrayList<>();
+
 }
 

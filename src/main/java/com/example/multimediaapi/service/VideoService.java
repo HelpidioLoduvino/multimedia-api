@@ -30,7 +30,6 @@ public class VideoService {
     private final LabelRepository labelRepository;
     private final BandRepository bandRepository;
     private final GroupRepository groupRepository;
-    private final ContentShareGroupRepository contentShareGroupRepository;
     private final VideoCompressionService videoCompressionService;
     private static final String uploadVideoDir = "src/main/resources/static/video/";
     private static final String compressedVideoDir = "src/main/resources/static/video/";
@@ -118,11 +117,9 @@ public class VideoService {
 
             Group myGroup = groupRepository.findByName(group);
 
-            ContentShareGroup contentShareGroup = new ContentShareGroup(null, savedVideo, myGroup);
+            myGroup.getContents().add(savedVideo);
 
-            contentShareGroupRepository.save(contentShareGroup);
-
-            return ResponseEntity.ok(contentShareGroup);
+            return ResponseEntity.ok(myGroup);
 
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error while uploading video: " + e.getMessage());
