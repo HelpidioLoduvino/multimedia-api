@@ -14,8 +14,5 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
     Group findMyGroupById(Long groupId);
     List<Group> findByNameNotAndMembersIsNotContaining(String groupName, Member user);
     List<Group> findAllByMembersIsContaining(Member user);
-    List<Group> findAllById(Long shareGroupId);
     Group findByMembersContainingAndId(Member members, Long id);
-    List<Group> findAllByMembersContainingAndId(Member userStatus, Long shareGroup_id);
-    List<Group> findAllByMembersIsContainingAndMembersIsNotContaining(Member user, Member member);
 }

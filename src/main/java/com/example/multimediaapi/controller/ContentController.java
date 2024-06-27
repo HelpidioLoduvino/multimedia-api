@@ -39,4 +39,9 @@ public class ContentController {
     public ResponseEntity<Content> getContentById(@PathVariable Long id) {
         return ResponseEntity.ok(contentService.getContent(id));
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Content>> search(@RequestParam String query) {
+        return ResponseEntity.ok(contentService.searchContent(query));
+    }
 }

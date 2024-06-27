@@ -1,10 +1,13 @@
 package com.example.multimediaapi.service;
 
 import com.example.multimediaapi.model.Content;
+import com.example.multimediaapi.model.Music;
 import com.example.multimediaapi.model.User;
 import com.example.multimediaapi.model.Video;
 import com.example.multimediaapi.repository.ContentRepository;
+import com.example.multimediaapi.repository.MusicRepository;
 import com.example.multimediaapi.repository.UserRepository;
+import com.example.multimediaapi.repository.VideoRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -15,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.Long.parseLong;
@@ -25,7 +29,8 @@ public class ContentService {
 
     private final ContentRepository contentRepository;
     private final UserRepository userRepository;
-    private static final long CHUNK_SIZE = 1024 * 1024; //tamanho de 1MB
+    private final MusicRepository musicRepository;
+    private final VideoRepository videoRepository;
 
     public List<Content> getAllContents() {
         return contentRepository.findAll();
@@ -141,6 +146,19 @@ public class ContentService {
         } catch (NumberFormatException e) {
             return 10;
         }
+    }
+
+    public List<Content> searchContent(String query) {
+
+        List<Music> musics = musicRepository.findAllByMusicRelease_MusicReleaseNameOrGenreNameOrAuthorName(query, query, query);
+
+        List<Video> videos = videoRepository.findAllByAuthorName(query);
+
+        List<Content> results = new ArrayList<>();
+        results.addAll(musics);
+        results.addAll(videos);
+
+        return results;
     }
 
 }
