@@ -1,6 +1,5 @@
 package com.example.multimediaapi.security;
 
-import ch.qos.logback.core.subst.Token;
 import com.example.multimediaapi.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

@@ -92,4 +92,14 @@ public class GroupController {
         return ResponseEntity.ok(groupService.getAllMyFriends().getBody());
     }
 
+    @GetMapping("/is-owner-or-editor/{id}")
+    public ResponseEntity<Boolean> isOwnerOrEditor(@PathVariable Long id){
+        return ResponseEntity.ok(groupService.isOwnerOrEditor(id));
+    }
+
+    @GetMapping("/is-owner/{id}")
+    public ResponseEntity<Boolean> isOwner(@PathVariable Long id){
+        return ResponseEntity.ok(groupService.isOwner(id));
+    }
+
 }

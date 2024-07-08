@@ -2,11 +2,14 @@ package com.example.multimediaapi.controller;
 
 import com.example.multimediaapi.dto.LoginDto;
 import com.example.multimediaapi.dto.TokenRefreshRequest;
+import com.example.multimediaapi.dto.UserDto;
 import com.example.multimediaapi.model.User;
 import com.example.multimediaapi.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
@@ -26,7 +29,7 @@ public class UserController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Object> getAllUsers() {
+    public ResponseEntity<List<UserDto>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 

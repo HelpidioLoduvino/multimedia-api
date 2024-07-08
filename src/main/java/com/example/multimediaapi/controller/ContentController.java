@@ -5,6 +5,7 @@ import com.example.multimediaapi.service.ContentService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,5 +44,10 @@ public class ContentController {
     @GetMapping("/search")
     public ResponseEntity<List<Content>> search(@RequestParam String query) {
         return ResponseEntity.ok(contentService.searchContent(query));
+    }
+
+    @GetMapping("/download/{id}")
+    public ResponseEntity<Resource> download(@PathVariable Long id){
+        return ResponseEntity.ok(contentService.download(id).getBody());
     }
 }

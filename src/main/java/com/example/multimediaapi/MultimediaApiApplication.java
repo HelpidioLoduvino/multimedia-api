@@ -5,12 +5,16 @@ import com.example.multimediaapi.model.Group;
 import com.example.multimediaapi.model.User;
 import com.example.multimediaapi.repository.GroupRepository;
 import com.example.multimediaapi.repository.UserRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootApplication
+@AllArgsConstructor
 public class MultimediaApiApplication {
 
 	public static void main(String[] args) {
@@ -28,8 +32,12 @@ public class MultimediaApiApplication {
 				adminUser.setName("Helpidio");
 				adminUser.setSurname("Mateus");
 				adminUser.setEmail("helpidio@gmail.com");
-				adminUser.setPassword("12345");
-				adminUser.setConfirmPassword("12345");
+
+				BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+				String encodedPassword = passwordEncoder.encode("12345");
+
+				adminUser.setPassword(encodedPassword);
+				adminUser.setConfirmPassword(encodedPassword);
 				adminUser.setUserRole("ADMIN");
 				userRepository.save(adminUser);
 			}

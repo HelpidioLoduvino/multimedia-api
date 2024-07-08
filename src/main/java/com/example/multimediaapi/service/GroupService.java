@@ -54,8 +54,9 @@ public class GroupService {
         Object principal = auth.getPrincipal();
         String email = ((UserDetails) principal).getUsername();
         User user = userRepository.findByUserEmail(email);
-        Member member = new Member(true, true, user);
-        return ResponseEntity.ok(groupRepository.findAllByMembersIsContaining(member));
+        Member member = new Member(user);
+        Member owner = new Member(true, true, user);
+        return ResponseEntity.ok(groupRepository.findAllByMembersContainingOrMembersContaining(member, owner));
     }
 
     public ResponseEntity<Object> getAllExceptMyAndPublicGroups(){
@@ -237,9 +238,8 @@ public class GroupService {
         Object principal = auth.getPrincipal();
         String email = ((UserDetails) principal).getUsername();
         User user = userRepository.findByUserEmail(email);
-        Member member = new Member(true, true, user);
-
-        List<Group> groups = groupRepository.findAllByMembersIsContaining(member);
+        Member owner = new Member(true, true, user);
+        List<Group> groups = groupRepository.findAllByMembersContaining(owner);
 
         Set<String> uniqueMemberNames = new HashSet<>();
 
@@ -260,5 +260,59 @@ public class GroupService {
         return ResponseEntity.ok(groupsWithoutCreatorAndUniqueNames);
 
     }
+
+    public Boolean isOwnerOrEditor(Long groupId){
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if(auth == null){
+            return false;
+        }
+
+        Object principal = auth.getPrincipal();
+        String email = ((UserDetails) principal).getUsername();
+        User user = userRepository.findByUserEmail(email);
+
+        Group group = groupRepository.findMyGroupById(groupId);
+
+        if(group == null){
+            return false;
+        }
+
+        for (Member member : group.getMembers()) {
+            if (member.getUser().equals(user)) {
+                return member.isOwnerOrEditor();
+            }
+        }
+
+        return false;
+    }
+
+
+    public Boolean isOwner(Long groupId){
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if(auth == null){
+            return false;
+        }
+
+        Object principal = auth.getPrincipal();
+        String email = ((UserDetails) principal).getUsername();
+        User user = userRepository.findByUserEmail(email);
+
+        Group group = groupRepository.findMyGroupById(groupId);
+
+        if(group == null){
+            return false;
+        }
+
+        for (Member member : group.getMembers()) {
+            if (member.getUser().equals(user)) {
+                return member.isOwner();
+            }
+        }
+
+        return false;
+    }
+
 
 }

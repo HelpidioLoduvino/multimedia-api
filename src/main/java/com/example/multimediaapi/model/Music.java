@@ -25,9 +25,6 @@ public class Music extends Content{
     private Category genre;
 
     @ManyToOne
-    private Album album;
-
-    @ManyToOne
     private MusicRelease musicRelease;
 
     @ManyToMany

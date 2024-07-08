@@ -22,4 +22,12 @@ public class Member {
     public Member(User user) {
         this.user = user;
     }
+
+    public boolean isOwnerOrEditor() {
+        return this.isOwner || this.isEditor;
+    }
+
+    public boolean isOwner() {
+        return this.isOwner;
+    }
 }

@@ -11,17 +11,18 @@ import com.example.multimediaapi.repository.VideoRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-
-import static java.lang.Long.parseLong;
 
 @Service
 @AllArgsConstructor
@@ -161,4 +162,40 @@ public class ContentService {
         return results;
     }
 
+    public ResponseEntity<Resource> download(Long contentId) {
+        Content content = contentRepository.findById(contentId).orElse(null);
+        if (content == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        Path path = Path.of(content.getPath());
+
+        Resource resource;
+
+        try {
+            resource = new org.springframework.core.io.UrlResource(path.toUri());
+        }catch (IOException e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.valueOf(content.getMimetype()))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
+
+    }
+
+    public Content update(Long contentId) {
+        Content content = contentRepository.findById(contentId).orElse(null);
+        if (content == null) {
+            return null;
+        }
+
+        Content updatedContent = new Content();
+        updatedContent.setTitle(content.getTitle());
+        updatedContent.setAuthor(content.getAuthor());
+
+        return updatedContent;
+
+    }
 }

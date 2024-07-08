@@ -26,10 +26,9 @@ public class PlaylistController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Object> getAllPlaylists(){
+    public ResponseEntity<List<Playlist>> getAllPlaylists(){
         return ResponseEntity.ok(playlistService.getAllPlaylists());
     }
-
 
     @GetMapping("/user-playlists")
     public ResponseEntity<Object> getPlaylistById(){

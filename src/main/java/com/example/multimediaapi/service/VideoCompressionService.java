@@ -13,13 +13,11 @@ public class VideoCompressionService {
     public File compressVideo(File source, String outputFilePath) throws IOException, InterruptedException {
         File target = new File(outputFilePath);
 
-        // Certifique-se de que o diretório de destino exista
         File targetDir = target.getParentFile();
         if (!targetDir.exists()) {
             targetDir.mkdirs();
         }
 
-        // Comando do ffmpeg para compressão
         String[] command = {
                 "ffmpeg",
                 "-i", source.getAbsolutePath(),     // Arquivo de entrada
@@ -29,7 +27,6 @@ public class VideoCompressionService {
                 "-vf", "scale=640:-1",              // Redimensiona o vídeo para largura de 640px mantendo a proporção
                 "-acodec", "aac",                   // Codec de áudio
                 "-b:a", "128k",                     // Taxa de bits de áudio
-                //"-b:v", "800k",                     // Taxa de bits de vídeo
                 target.getAbsolutePath()            // Arquivo de saída
         };
 
@@ -38,7 +35,6 @@ public class VideoCompressionService {
 
         Process process = processBuilder.start();
 
-        // Log output
         new Thread(() -> {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
