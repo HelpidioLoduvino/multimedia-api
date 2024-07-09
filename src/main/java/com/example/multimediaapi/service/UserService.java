@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -29,6 +30,7 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final ApplicationContext applicationContext;
     private final TokenService tokenService;
+    //private final MailService mailService;
 
 
     @Override
@@ -50,6 +52,14 @@ public class UserService implements UserDetailsService {
             User newUser = new User(null, user.getName(), user.getSurname(), user.getEmail(), encodedPassword, user.getUserRole(), null);
 
             userRepository.save(newUser);
+
+            /*
+            String verificationCode = generateVerificationCode();
+
+            mailService.sendSimpleMessage(user.getEmail(), "Código de Verificação",
+                    "Seu código de verificação é: " + verificationCode);
+
+             */
 
             return ResponseEntity.ok(newUser);
 
@@ -91,9 +101,8 @@ public class UserService implements UserDetailsService {
         return userRepository.findAllUsers();
     }
 
-    public ResponseEntity<Object> deleteUser(Long id) {
+    public void deleteUser(Long id) {
         userRepository.deleteById(id);
-        return ResponseEntity.ok().build();
     }
 
     public List<User> getAllUsersByClientRole(){
@@ -105,5 +114,12 @@ public class UserService implements UserDetailsService {
         Long id = user.getId();
         return userRepository.findAllByUserRoleAndIdNot("CLIENT", id);
     }
+
+    /*
+    private String generateVerificationCode() {
+        return UUID.randomUUID().toString();
+    }
+
+     */
 
 }

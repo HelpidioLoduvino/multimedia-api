@@ -69,6 +69,17 @@ public class GroupService {
         return ResponseEntity.ok(groupRepository.findByNameNotAndMembersIsNotContaining("Público", member));
     }
 
+    public List<Group> getAllMyGroupsOrPublicGroups(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) { return null;}
+        Object principal = auth.getPrincipal();
+        String email = ((UserDetails) principal).getUsername();
+        User user = userRepository.findByUserEmail(email);
+        Member member = new Member(user);
+        Member owner = new Member(true, true, user);
+        return groupRepository.findByNameOrMembersIsContainingOrMembersContaining("Público", member, owner);
+    }
+
     public List<Group> getAllGroups() {
         return groupRepository.findAll();
     }

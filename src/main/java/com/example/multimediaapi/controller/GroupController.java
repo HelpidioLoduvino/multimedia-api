@@ -40,6 +40,11 @@ public class GroupController {
         return ResponseEntity.ok(groupService.getAllExceptMyAndPublicGroups());
     }
 
+    @GetMapping("all-my-groups-or-public-groups")
+    public ResponseEntity<List<Group>> getAllMyGroupsOrPublicGroups() {
+        return ResponseEntity.ok(groupService.getAllMyGroupsOrPublicGroups());
+    }
+
     @GetMapping("/all")
     public ResponseEntity<Object> getAll() {
         return ResponseEntity.ok(groupService.getAllGroups());
