@@ -13,9 +13,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -29,6 +26,7 @@ public class ContentService {
 
     private final ContentRepository contentRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
     private final MusicRepository musicRepository;
     private final VideoRepository videoRepository;
 
@@ -38,10 +36,7 @@ public class ContentService {
 
     public List<Content> getAllContentsByUserId() {
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) { return null;}
-        Object principal = auth.getPrincipal();
-        String email = ((UserDetails) principal).getUsername();
+        String email = userService.getCurrentUser();
 
         User user = userRepository.findByUserEmail(email);
 

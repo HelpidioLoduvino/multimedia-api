@@ -31,6 +31,7 @@ public class MusicService {
     private static final String uploadDir = "src/main/resources/static/music/";
     private static final String uploadImgDir = "src/main/resources/static/cover/";
     private final UserRepository userRepository;
+    private final UserService userService;
     private final MusicRepository musicRepository;
     private final AuthorRepository authorRepository;
     private final CategoryRepository categoryRepository;
@@ -45,10 +46,7 @@ public class MusicService {
     @Transactional(rollbackFor = Exception.class)
     public Music uploadMusic(Music music, String group, MultipartFile musicFile, MultipartFile imageFile) {
         try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth == null) { return null;}
-            Object principal = auth.getPrincipal();
-            String email = ((UserDetails) principal).getUsername();
+            String email = userService.getCurrentUser();
 
             User user = userRepository.findByUserEmail(email);
 
@@ -230,16 +228,10 @@ public class MusicService {
     }
 
     public List<Music> getAllMusicsByUserId(){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) { return null;}
-        Object principal = auth.getPrincipal();
-        String email = ((UserDetails) principal).getUsername();
-
+        String email = userService.getCurrentUser();
         User user = userRepository.findByUserEmail(email);
         Long userId = user.getId();
-
         return musicRepository.findAllByUserId(userId);
-
     }
 
 }

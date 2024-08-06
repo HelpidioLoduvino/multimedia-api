@@ -26,6 +26,7 @@ public class AlbumService {
     private final MusicReleaseRepository musicReleaseRepository;
     private final AlbumReviewRepository albumReviewRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
     private final MusicRepository musicRepository;
 
 
@@ -59,13 +60,8 @@ public class AlbumService {
     }
 
     public AlbumReview addAlbumReview(AlbumReview albumReview, Long albumId) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) {
-            return null;
-        }
+        String email = userService.getCurrentUser();
 
-        Object principal = auth.getPrincipal();
-        String email = ((UserDetails) principal).getUsername();
         User user = userRepository.findByUserEmail(email);
         Long userId = user.getId();
 

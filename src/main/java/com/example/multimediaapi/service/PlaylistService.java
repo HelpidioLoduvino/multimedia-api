@@ -8,9 +8,6 @@ import com.example.multimediaapi.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -22,14 +19,12 @@ public class PlaylistService {
 
     private final PlayListRepository playListRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
     private final ContentRepository contentRepository;
 
     public Playlist addPlaylist(Playlist playList, List<Long> contentIds){
         try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth == null) { return null;}
-            Object principal = auth.getPrincipal();
-            String email = ((UserDetails) principal).getUsername();
+            String email = userService.getCurrentUser();
 
             User user = userRepository.findByUserEmail(email);
 
@@ -62,20 +57,14 @@ public class PlaylistService {
         return playListRepository.findAll();
     }
     public List<Playlist> getAllPlaylistsByUserId() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) { return null;}
-        Object principal = auth.getPrincipal();
-        String email = ((UserDetails) principal).getUsername();
+        String email = userService.getCurrentUser();
         User user = userRepository.findByUserEmail(email);
         Long userId = user.getId();
         return playListRepository.findAllByUserId(userId);
     }
 
     public List<Playlist> getAllPublicPlaylists(){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) { return null;}
-        Object principal = auth.getPrincipal();
-        String email = ((UserDetails) principal).getUsername();
+        String email = userService.getCurrentUser();
         User user = userRepository.findByUserEmail(email);
         Long userId = user.getId();
         return playListRepository.findAllPublicPlaylistsWithDifferentUserId(userId);

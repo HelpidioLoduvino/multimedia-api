@@ -19,6 +19,7 @@ import java.util.List;
 public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
 
     public DeferredResult<List<Notification>> getNotifications() {
         DeferredResult<List<Notification>> deferredResult = new DeferredResult<>(5000L);
@@ -35,10 +36,7 @@ public class NotificationService {
 
     private List<Notification> checkForNotifications() {
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) { return null;}
-        Object principal = auth.getPrincipal();
-        String email = ((UserDetails) principal).getUsername();
+        String email = userService.getCurrentUser();
 
         User user = userRepository.findByUserEmail(email);
 

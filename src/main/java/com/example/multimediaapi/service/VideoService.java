@@ -3,10 +3,6 @@ package com.example.multimediaapi.service;
 import com.example.multimediaapi.model.*;
 import com.example.multimediaapi.repository.*;
 import lombok.AllArgsConstructor;
-import org.springframework.http.*;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,6 +21,7 @@ public class VideoService {
 
     private final VideoRepository videoRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
     private final AuthorRepository authorRepository;
     private final FeatureRepository featureRepository;
     private final LabelRepository labelRepository;
@@ -38,12 +35,11 @@ public class VideoService {
     @Transactional(rollbackFor = Exception.class)
     public Video uploadVideo(Video video, String group, MultipartFile videoFile) {
         try{
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth == null) { return null;}
-            Object principal = auth.getPrincipal();
-            String email = ((UserDetails) principal).getUsername();
+
+            String email = userService.getCurrentUser();
 
             User user = userRepository.findByUserEmail(email);
+
             String videoFileName = generateUniqueFileName(videoFile.getOriginalFilename());
 
             saveVideoFile(videoFile, videoFileName);

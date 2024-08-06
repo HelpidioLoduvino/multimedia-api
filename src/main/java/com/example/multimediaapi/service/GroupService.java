@@ -20,16 +20,14 @@ public class GroupService {
 
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
     private final ContentRepository contentRepository;
     private final RequestToJoinGroupRepository requestToJoinGroupRepository;
     private final NotificationRepository notificationRepository;
 
     public Group createGroup(Group myGroup) {
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) { return null;}
-        Object principal = auth.getPrincipal();
-        String email = ((UserDetails) principal).getUsername();
+        String email = userService.getCurrentUser();
 
         User user = userRepository.findByUserEmail(email);
 
@@ -49,10 +47,7 @@ public class GroupService {
     }
 
     public List<Group> getAllMyGroups(){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) { return null;}
-        Object principal = auth.getPrincipal();
-        String email = ((UserDetails) principal).getUsername();
+        String email = userService.getCurrentUser();
         User user = userRepository.findByUserEmail(email);
         Member member = new Member(user);
         Member owner = new Member(true, true, user);
@@ -60,20 +55,14 @@ public class GroupService {
     }
 
     public List<Group> getAllExceptMyAndPublicGroups(){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) { return null;}
-        Object principal = auth.getPrincipal();
-        String email = ((UserDetails) principal).getUsername();
+        String email = userService.getCurrentUser();
         User user = userRepository.findByUserEmail(email);
         Member member = new Member(user);
         return groupRepository.findByNameNotAndMembersIsNotContaining("Público", member);
     }
 
     public List<Group> getAllMyGroupsOrPublicGroups(){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) { return null;}
-        Object principal = auth.getPrincipal();
-        String email = ((UserDetails) principal).getUsername();
+        String email = userService.getCurrentUser();
         User user = userRepository.findByUserEmail(email);
         Member member = new Member(user);
         Member owner = new Member(true, true, user);
@@ -91,10 +80,7 @@ public class GroupService {
     @Transactional
     public RequestToJoinGroup requestToJoinGroup(Long groupId) {
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) { return null;}
-        Object principal = auth.getPrincipal();
-        String email = ((UserDetails) principal).getUsername();
+        String email = userService.getCurrentUser();
 
         User user = userRepository.findByUserEmail(email);
 
@@ -225,10 +211,7 @@ public class GroupService {
     }
 
     public List<Group> getAllMyFriends(){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) { return null;}
-        Object principal = auth.getPrincipal();
-        String email = ((UserDetails) principal).getUsername();
+        String email = userService.getCurrentUser();
         User user = userRepository.findByUserEmail(email);
         Member owner = new Member(true, true, user);
         List<Group> groups = groupRepository.findAllByMembersContaining(owner);
@@ -253,13 +236,8 @@ public class GroupService {
 
     public Boolean isOwnerOrEditor(Long groupId){
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if(auth == null){
-            return false;
-        }
+        String email = userService.getCurrentUser();
 
-        Object principal = auth.getPrincipal();
-        String email = ((UserDetails) principal).getUsername();
         User user = userRepository.findByUserEmail(email);
 
         Group group = groupRepository.findMyGroupById(groupId);
@@ -280,13 +258,8 @@ public class GroupService {
 
     public Boolean isOwner(Long groupId){
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if(auth == null){
-            return false;
-        }
+        String email = userService.getCurrentUser();
 
-        Object principal = auth.getPrincipal();
-        String email = ((UserDetails) principal).getUsername();
         User user = userRepository.findByUserEmail(email);
 
         Group group = groupRepository.findMyGroupById(groupId);

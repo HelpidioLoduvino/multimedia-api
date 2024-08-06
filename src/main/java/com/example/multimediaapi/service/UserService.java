@@ -95,4 +95,19 @@ public class UserService implements UserDetailsService {
         return userRepository.findAllByUserRoleAndIdNot("CLIENT", id);
     }
 
+    public String getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = null;
+
+        if (authentication != null) {
+            Object principal = authentication.getPrincipal();
+            if (principal instanceof UserDetails) {
+                username = ((UserDetails) principal).getUsername();
+            } else {
+                username = principal.toString();
+            }
+        }
+        return username;
+    }
+
 }
