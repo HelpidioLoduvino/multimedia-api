@@ -41,17 +41,6 @@ public class MultimediaApiApplication {
 				adminUser.setUserRole("ADMIN");
 				userRepository.save(adminUser);
 			}
-
-			boolean groupExists = groupRepository.existsByName("Público");
-
-			if (!groupExists) {
-				Group firstMyGroup = new Group();
-				Member member = new Member(true, true, adminUser);
-				firstMyGroup.setName("Público");
-				firstMyGroup.setStatus("Público");
-				firstMyGroup.getMembers().add(member);
-				groupRepository.save(firstMyGroup);
-			}
 		};
 	}
 }

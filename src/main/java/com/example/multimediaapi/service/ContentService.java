@@ -17,7 +17,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -37,10 +36,10 @@ public class ContentService {
         return contentRepository.findAll();
     }
 
-    public ResponseEntity<Object> getAllContentsByUserId() {
+    public List<Content> getAllContentsByUserId() {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
+        if (auth == null) { return null;}
         Object principal = auth.getPrincipal();
         String email = ((UserDetails) principal).getUsername();
 
@@ -48,7 +47,7 @@ public class ContentService {
 
         Long userId = user.getId();
 
-        return ResponseEntity.ok(contentRepository.findAllByUserId(userId));
+        return contentRepository.findAllByUserId(userId);
     }
 
     public Content getContent(Long id){
@@ -162,10 +161,10 @@ public class ContentService {
         return results;
     }
 
-    public ResponseEntity<Resource> download(Long contentId) {
+    public Resource download(Long contentId) {
         Content content = contentRepository.findById(contentId).orElse(null);
         if (content == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new RuntimeException("Conteudo não encontrado!");
         }
 
         Path path = Path.of(content.getPath());
@@ -175,27 +174,13 @@ public class ContentService {
         try {
             resource = new org.springframework.core.io.UrlResource(path.toUri());
         }catch (IOException e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new RuntimeException(e);
         }
 
         return ResponseEntity.ok()
                 .contentType(MediaType.valueOf(content.getMimetype()))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                .body(resource);
-
-    }
-
-    public Content update(Long contentId) {
-        Content content = contentRepository.findById(contentId).orElse(null);
-        if (content == null) {
-            return null;
-        }
-
-        Content updatedContent = new Content();
-        updatedContent.setTitle(content.getTitle());
-        updatedContent.setAuthor(content.getAuthor());
-
-        return updatedContent;
+                .body(resource).getBody();
 
     }
 }

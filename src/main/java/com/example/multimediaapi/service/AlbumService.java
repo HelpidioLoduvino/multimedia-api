@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -30,12 +29,11 @@ public class AlbumService {
     private final MusicRepository musicRepository;
 
 
-    public ResponseEntity<List<MusicRelease>> getAllAlbums() {
-        List<MusicRelease> albums = musicReleaseRepository.findAllByReleaseType("Album");
-        return new ResponseEntity<>(albums, HttpStatus.OK);
+    public List<MusicRelease> getAllAlbums() {
+        return musicReleaseRepository.findAllByReleaseType("Album");
     }
 
-    public ResponseEntity<Resource> showAlbumImage(Long id){
+    public Resource showAlbumImage(Long id){
         try{
             MusicRelease album = musicReleaseRepository.findById(id).orElse(null);
             if(album != null){
@@ -48,7 +46,7 @@ public class AlbumService {
                     return ResponseEntity.ok()
                             .headers(headers)
                             .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                            .body(resource);
+                            .body(resource).getBody();
                 } else {
                     throw new RuntimeException("Não foi possível ler o arquivo!");
                 }
@@ -57,13 +55,13 @@ public class AlbumService {
         }catch (MalformedURLException e) {
             throw new RuntimeException("Erro: " + e.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        return null;
     }
 
-    public ResponseEntity<AlbumReview> addAlbumReview(AlbumReview albumReview, Long albumId) {
+    public AlbumReview addAlbumReview(AlbumReview albumReview, Long albumId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            return null;
         }
 
         Object principal = auth.getPrincipal();
@@ -73,12 +71,12 @@ public class AlbumService {
 
         AlbumReview userReview = albumReviewRepository.findByUser_IdAndMusicRelease_Id(userId, albumId);
         if (userReview != null) {
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            throw new RuntimeException("Conflito");
         }
 
         MusicRelease album = musicReleaseRepository.findById(albumId).orElse(null);
         if (album == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new RuntimeException("Album não encontrado");
         }
 
         AlbumReview review = new AlbumReview(null, albumReview.getRating(), 0, albumReview.getOverview(), album, user);
@@ -93,11 +91,11 @@ public class AlbumService {
             albumReviewRepository.save(r);
         });
 
-        return ResponseEntity.ok(review);
+        return review;
     }
 
-    public ResponseEntity<MusicRelease> getAlbum(Long albumId){
-        return ResponseEntity.ok(musicReleaseRepository.findById(albumId).orElse(null));
+    public MusicRelease getAlbum(Long albumId){
+        return musicReleaseRepository.findById(albumId).orElse(null);
     }
 
     public List<AlbumReview> getAlbumReviews(Long albumId){

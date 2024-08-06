@@ -13,45 +13,43 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/album")
+@RequestMapping("/api/albums")
 @AllArgsConstructor
 public class AlbumController {
 
     private final AlbumService albumService;
 
-    @GetMapping("/all")
+    @GetMapping
     public ResponseEntity<List<MusicRelease>> getAllAlbums() {
-        return ResponseEntity.ok(albumService.getAllAlbums().getBody());
+        return ResponseEntity.ok(albumService.getAllAlbums());
     }
 
     @GetMapping("/cover/{id}")
     public ResponseEntity<Resource> displayMusicCover(@PathVariable Long id) {
-        ResponseEntity<Resource> cover = albumService.showAlbumImage(id);
-        return ResponseEntity.ok(cover.getBody());
+        return ResponseEntity.ok(albumService.showAlbumImage(id));
     }
 
-    @PostMapping("/criticise-album")
+    @PostMapping("/criticise")
     public ResponseEntity<AlbumReview> criticiseAlbum(@RequestBody AlbumReview albumReview, @RequestParam Long albumId) {
-        ResponseEntity<AlbumReview> newAlbumReview = albumService.addAlbumReview(albumReview, albumId);
-        return ResponseEntity.ok(newAlbumReview.getBody());
+        return ResponseEntity.ok(albumService.addAlbumReview(albumReview, albumId));
     }
 
-    @GetMapping("/album/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<MusicRelease> getAlbumInfoById(@PathVariable Long id) {
-        return ResponseEntity.ok(albumService.getAlbum(id).getBody());
+        return ResponseEntity.ok(albumService.getAlbum(id));
     }
 
-    @GetMapping("/album-review/{id}")
+    @GetMapping("/review/{id}")
     public ResponseEntity<List<AlbumReview>> getAlbumReviewById(@PathVariable Long id) {
         return ResponseEntity.ok(albumService.getAlbumReviews(id));
     }
 
-    @GetMapping("/album-review-overall/{id}")
+    @GetMapping("/overall/{id}")
     public ResponseEntity<Double> getAlbumReviewOverallById(@PathVariable Long id) {
         return ResponseEntity.ok(albumService.getAlbumReviewOverall(id));
     }
 
-    @GetMapping("/album-music/{id}")
+    @GetMapping("/music/{id}")
     public ResponseEntity<List<Music>> getAlbumMusic(@PathVariable Long id){
         return ResponseEntity.ok(albumService.getMusicFromAlbum(id));
     }

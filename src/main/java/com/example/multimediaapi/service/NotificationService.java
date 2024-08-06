@@ -6,7 +6,6 @@ import com.example.multimediaapi.model.User;
 import com.example.multimediaapi.repository.NotificationRepository;
 import com.example.multimediaapi.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,16 +17,16 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class NotificationService {
-    private NotificationRepository notificationRepository;
-    private UserRepository userRepository;
+    private final NotificationRepository notificationRepository;
+    private final UserRepository userRepository;
 
-    public DeferredResult<ResponseEntity<List<Notification>>> getNotifications() {
-        DeferredResult<ResponseEntity<List<Notification>>> deferredResult = new DeferredResult<>(5000L);
+    public DeferredResult<List<Notification>> getNotifications() {
+        DeferredResult<List<Notification>> deferredResult = new DeferredResult<>(5000L);
         List<Notification> notifications = checkForNotifications();
         if (notifications.isEmpty()) {
-            deferredResult.onTimeout(() -> deferredResult.setResult(ResponseEntity.noContent().build()));
+            deferredResult.onTimeout(() -> deferredResult.setResult(null));
         } else {
-            deferredResult.setResult(ResponseEntity.ok(notifications));
+            deferredResult.setResult(notifications);
             markNotificationsAsRead(notifications);
         }
         return deferredResult;

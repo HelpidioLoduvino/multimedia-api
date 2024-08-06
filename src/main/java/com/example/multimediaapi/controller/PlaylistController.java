@@ -10,44 +10,44 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/playlist")
+@RequestMapping("/api/playlists")
 @AllArgsConstructor
 public class PlaylistController {
     private PlaylistService playlistService;
 
-    @PostMapping("/add")
+    @PostMapping
     public ResponseEntity<Playlist> addPlaylist(@RequestBody Playlist playlist, @RequestParam List<Long> contentIds){
-        return ResponseEntity.ok(playlistService.addPlaylist(playlist, contentIds).getBody());
+        return ResponseEntity.ok(playlistService.addPlaylist(playlist, contentIds));
     }
 
-    @GetMapping("playlist/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Playlist> getPlaylist(@PathVariable Long id){
         return ResponseEntity.ok(playlistService.getPlaylist(id));
     }
 
-    @GetMapping("/all")
+    @GetMapping
     public ResponseEntity<List<Playlist>> getAllPlaylists(){
         return ResponseEntity.ok(playlistService.getAllPlaylists());
     }
 
-    @GetMapping("/user-playlists")
+    @GetMapping("/user")
     public ResponseEntity<Object> getPlaylistById(){
         return ResponseEntity.ok(playlistService.getAllPlaylistsByUserId());
     }
 
-    @GetMapping("public-playlists")
+    @GetMapping("/public")
     public ResponseEntity<Object> getAllPublicPlaylists(){
         return ResponseEntity.ok(playlistService.getAllPublicPlaylists());
     }
 
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Object> deletePlaylist(@PathVariable Long id){
         playlistService.deletePlaylist(id);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/add-content-to-playlist")
+    @PostMapping("/content")
     public ResponseEntity<Object> addContentToPlaylist(@RequestParam Long contentId, @RequestParam List<Long> playlistIds){
         playlistService.addContentToPlaylist(contentId, playlistIds);
         return ResponseEntity.ok().build();

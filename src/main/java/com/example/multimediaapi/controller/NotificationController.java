@@ -12,13 +12,13 @@ import org.springframework.web.context.request.async.DeferredResult;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/notification")
+@RequestMapping("/api/notifications")
 @AllArgsConstructor
 public class NotificationController {
     private final NotificationService notificationService;
 
-    @GetMapping("/notifications")
-    public DeferredResult<ResponseEntity<List<Notification>>> getNotifications() {
+    @GetMapping
+    public DeferredResult<List<Notification>> getNotifications() {
         return notificationService.getNotifications();
     }
 

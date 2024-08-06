@@ -36,10 +36,10 @@ public class VideoService {
 
 
     @Transactional(rollbackFor = Exception.class)
-    public ResponseEntity<Object> uploadVideo(Video video, String group, MultipartFile videoFile) {
+    public Video uploadVideo(Video video, String group, MultipartFile videoFile) {
         try{
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
+            if (auth == null) { return null;}
             Object principal = auth.getPrincipal();
             String email = ((UserDetails) principal).getUsername();
 
@@ -119,15 +119,11 @@ public class VideoService {
 
             myGroup.getContents().add(savedVideo);
 
-            return ResponseEntity.ok(myGroup);
+            return newVideo;
 
         }catch(Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error while uploading video: " + e.getMessage());
+            throw new RuntimeException("Erro ao fazer upload do vídeo" + e.getMessage(), e);
         }
-    }
-
-    public List<Video> getAllVideos() {
-        return videoRepository.findAll();
     }
 
     private String generateUniqueFileName(String originalFilename) {

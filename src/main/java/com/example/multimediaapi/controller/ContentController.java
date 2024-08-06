@@ -14,23 +14,23 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/content")
+@RequestMapping("/api/contents")
 @AllArgsConstructor
 public class ContentController {
 
     private final ContentService contentService;
 
-    @GetMapping("/all")
+    @GetMapping
     public ResponseEntity<List<Content>> getAll() {
         return ResponseEntity.ok(contentService.getAllContents());
     }
 
-    @GetMapping("all-contents-by-user-id")
+    @GetMapping("/user")
     public ResponseEntity<Object> getAllContentsByUserId() {
         return ResponseEntity.ok(contentService.getAllContentsByUserId());
     }
 
-    @GetMapping("/stream-content/{id}")
+    @GetMapping("/stream/{id}")
     public void streamVideo(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response) throws IOException {
         contentService.streamContent(id, request, response);
     }
@@ -48,6 +48,6 @@ public class ContentController {
 
     @GetMapping("/download/{id}")
     public ResponseEntity<Resource> download(@PathVariable Long id){
-        return ResponseEntity.ok(contentService.download(id).getBody());
+        return ResponseEntity.ok(contentService.download(id));
     }
 }

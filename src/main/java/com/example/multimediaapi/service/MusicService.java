@@ -7,7 +7,6 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -44,10 +43,10 @@ public class MusicService {
     private final ContentRepository contentRepository;
 
     @Transactional(rollbackFor = Exception.class)
-    public ResponseEntity<Object> uploadMusic(Music music, String group, MultipartFile musicFile, MultipartFile imageFile) {
+    public Music uploadMusic(Music music, String group, MultipartFile musicFile, MultipartFile imageFile) {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
+            if (auth == null) { return null;}
             Object principal = auth.getPrincipal();
             String email = ((UserDetails) principal).getUsername();
 
@@ -158,10 +157,10 @@ public class MusicService {
 
             groupRepository.save(myGroup);
 
-            return ResponseEntity.ok(myGroup);
+            return newMusic;
 
         }catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error while uploading music: " + e.getMessage());
+            throw new RuntimeException("Erro ao fazer upload da música: " + e.getMessage(), e);
         }
     }
 
@@ -199,7 +198,7 @@ public class MusicService {
         Files.write(filePath, file.getBytes());
     }
 
-    public ResponseEntity<Resource> displayCover(Long id){
+    public Resource displayCover(Long id){
         try{
             Content content = contentRepository.findById(id).orElse(null);
             if(content != null){
@@ -215,31 +214,31 @@ public class MusicService {
                             return ResponseEntity.ok()
                                     .headers(headers)
                                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                                    .body(resource);
+                                    .body(resource).getBody();
                         } else {
                             throw new RuntimeException("Não foi possível ler o arquivo!");
                         }
                     }
                 } else {
-                    return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+                    return null;
                 }
             }
         }catch (MalformedURLException e) {
             throw new RuntimeException("Erro: " + e.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        return null;
     }
 
-    public ResponseEntity<List<Music>> getAllMusicsByUserId(){
+    public List<Music> getAllMusicsByUserId(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
+        if (auth == null) { return null;}
         Object principal = auth.getPrincipal();
         String email = ((UserDetails) principal).getUsername();
 
         User user = userRepository.findByUserEmail(email);
         Long userId = user.getId();
 
-        return ResponseEntity.ok(musicRepository.findAllByUserId(userId));
+        return musicRepository.findAllByUserId(userId);
 
     }
 

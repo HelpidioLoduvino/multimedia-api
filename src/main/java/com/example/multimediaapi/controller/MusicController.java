@@ -11,34 +11,33 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/music")
+@RequestMapping("/api/musics")
 @AllArgsConstructor
 public class MusicController {
 
     private final MusicService musicService;
 
-    @PostMapping("/upload")
+    @PostMapping
     public ResponseEntity<Object> upload(@RequestPart("music")Music music, @RequestParam String group,  @RequestPart("musicFile") MultipartFile musicFile, @RequestPart("imageFile") MultipartFile imgFile){
         return  ResponseEntity.ok(musicService.uploadMusic(music, group, musicFile, imgFile));
     }
 
-    @GetMapping("/all")
+    @GetMapping
     public ResponseEntity<List<Music>> getAll() {
         return ResponseEntity.ok(musicService.getAll());
     }
 
-    @GetMapping("all-musics-by-user-id")
+    @GetMapping("/user")
     public ResponseEntity<List<Music>> getAllContentsByUserId() {
-        return ResponseEntity.ok(musicService.getAllMusicsByUserId().getBody());
+        return ResponseEntity.ok(musicService.getAllMusicsByUserId());
     }
 
     @GetMapping("/cover/{id}")
     public ResponseEntity<Resource> displayMusicCover(@PathVariable Long id) {
-        ResponseEntity<Resource> cover = musicService.displayCover(id);
-        return ResponseEntity.ok(cover.getBody());
+        return ResponseEntity.ok(musicService.displayCover(id));
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Object> delete(@PathVariable Long id) {
         musicService.delete(id);
         return ResponseEntity.ok().build();

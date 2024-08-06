@@ -24,10 +24,10 @@ public class GroupService {
     private final RequestToJoinGroupRepository requestToJoinGroupRepository;
     private final NotificationRepository notificationRepository;
 
-    public ResponseEntity<Object> createGroup(Group myGroup) {
+    public Group createGroup(Group myGroup) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
+        if (auth == null) { return null;}
         Object principal = auth.getPrincipal();
         String email = ((UserDetails) principal).getUsername();
 
@@ -37,7 +37,7 @@ public class GroupService {
 
         myGroup.getMembers().add(member);
 
-        return ResponseEntity.ok(groupRepository.save(myGroup));
+        return groupRepository.save(myGroup);
     }
 
     public Group getGroup(Long groupId) {
@@ -48,25 +48,25 @@ public class GroupService {
         return groupRepository.findByName("Público");
     }
 
-    public ResponseEntity<Object> getAllMyGroups(){
+    public List<Group> getAllMyGroups(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
+        if (auth == null) { return null;}
         Object principal = auth.getPrincipal();
         String email = ((UserDetails) principal).getUsername();
         User user = userRepository.findByUserEmail(email);
         Member member = new Member(user);
         Member owner = new Member(true, true, user);
-        return ResponseEntity.ok(groupRepository.findAllByMembersContainingOrMembersContaining(member, owner));
+        return groupRepository.findAllByMembersContainingOrMembersContaining(member, owner);
     }
 
-    public ResponseEntity<Object> getAllExceptMyAndPublicGroups(){
+    public List<Group> getAllExceptMyAndPublicGroups(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
+        if (auth == null) { return null;}
         Object principal = auth.getPrincipal();
         String email = ((UserDetails) principal).getUsername();
         User user = userRepository.findByUserEmail(email);
         Member member = new Member(user);
-        return ResponseEntity.ok(groupRepository.findByNameNotAndMembersIsNotContaining("Público", member));
+        return groupRepository.findByNameNotAndMembersIsNotContaining("Público", member);
     }
 
     public List<Group> getAllMyGroupsOrPublicGroups(){
@@ -89,10 +89,10 @@ public class GroupService {
     }
 
     @Transactional
-    public ResponseEntity<Object> requestToJoinGroup(Long groupId) {
+    public RequestToJoinGroup requestToJoinGroup(Long groupId) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
+        if (auth == null) { return null;}
         Object principal = auth.getPrincipal();
         String email = ((UserDetails) principal).getUsername();
 
@@ -101,13 +101,13 @@ public class GroupService {
         Group myGroup = groupRepository.findMyGroupById(groupId);
 
         if(myGroup == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new RuntimeException("Group not found");
         }
 
         Optional<RequestToJoinGroup> existingRequest = requestToJoinGroupRepository.findByUserAndGroup(user, myGroup);
 
         if (existingRequest.isPresent()) {
-            return new ResponseEntity<>("Você já fez um pedido para entrar neste grupo", HttpStatus.BAD_REQUEST);
+            throw  new RuntimeException("Você já fez um pedido para entrar neste grupo");
         }
 
         RequestToJoinGroup requestToJoinGroup = new RequestToJoinGroup(null, "PENDING", user, myGroup);
@@ -123,29 +123,20 @@ public class GroupService {
 
         notificationRepository.save(notification);
 
-        return ResponseEntity.ok(requestToJoinGroup);
+        return requestToJoinGroup;
     }
 
-    public ResponseEntity<List<RequestToJoinGroup>> getAllJoinRequestsByGroupId(Long id) {
-        return ResponseEntity.ok(requestToJoinGroupRepository.findAllByGroup_IdAndRequestStatus(id, "PENDING"));
+    public List<RequestToJoinGroup> getAllJoinRequestsByGroupId(Long id) {
+        return requestToJoinGroupRepository.findAllByGroup_IdAndRequestStatus(id, "PENDING");
     }
 
     @Transactional
-    public ResponseEntity<Object> acceptRequestToJoinGroup(Long requestId) {
-
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-        Object principal = auth.getPrincipal();
-        String email = ((UserDetails) principal).getUsername();
-
-        User user = userRepository.findByUserEmail(email);
+    public RequestToJoinGroup acceptRequestToJoinGroup(Long requestId) {
 
         RequestToJoinGroup requestToJoinGroup = requestToJoinGroupRepository.findById(requestId).orElse(null);
 
         if(requestToJoinGroup == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new RuntimeException("Request not found");
         }
 
         requestToJoinGroup.setRequestStatus("ACCEPTED");
@@ -160,29 +151,19 @@ public class GroupService {
 
         requestToJoinGroupRepository.save(requestToJoinGroup);
 
-        Notification notification = new Notification();
-        notification.setSender(user);
-        notification.setRecipient(requestToJoinGroup.getUser());
-        notification.setMyGroup(group);
-        notification.setOpened(false);
-        notification.setMessage("Deseja que vc faça parte do grupo");
-
-        notificationRepository.save(notification);
-
-        return ResponseEntity.ok(requestToJoinGroup);
+        return requestToJoinGroup;
     }
 
     @Transactional
-    public ResponseEntity<Object> rejectRequestToJoinGroup(Long requestId) {
+    public RequestToJoinGroup rejectRequestToJoinGroup(Long requestId) {
         RequestToJoinGroup requestToJoinGroup = requestToJoinGroupRepository.findById(requestId).orElse(null);
         if(requestToJoinGroup == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new RuntimeException("Request not found");
         }
-
         requestToJoinGroup.setRequestStatus("REJECTED");
         requestToJoinGroupRepository.save(requestToJoinGroup);
 
-        return ResponseEntity.ok(requestToJoinGroup);
+        return requestToJoinGroup;
     }
 
     public ResponseEntity<Object> updateUserStatusToGroupOwner(Long userId, Long groupId) {
@@ -206,7 +187,7 @@ public class GroupService {
         return ResponseEntity.ok(groupRepository.save(group));
     }
 
-    public ResponseEntity<Object> updateUserToGroupEditor(Long userId, Long groupId) {
+    public Group updateUserToGroupEditor(Long userId, Long groupId) {
 
         User user = userRepository.findById(userId).orElse(null);
 
@@ -215,7 +196,7 @@ public class GroupService {
         Group group = groupRepository.findByMembersContainingAndId(member, groupId);
 
         if(group == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new RuntimeException("Group not found");
         }
 
         group.getMembers().remove(member);
@@ -224,7 +205,7 @@ public class GroupService {
 
         group.getMembers().add(newMember);
 
-        return ResponseEntity.ok(groupRepository.save(group));
+        return groupRepository.save(group);
     }
 
     public void addContentToGroup(Long contentId, List<Long> groupId){
@@ -243,9 +224,9 @@ public class GroupService {
 
     }
 
-    public ResponseEntity<List<Group>> getAllMyFriends(){
+    public List<Group> getAllMyFriends(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
+        if (auth == null) { return null;}
         Object principal = auth.getPrincipal();
         String email = ((UserDetails) principal).getUsername();
         User user = userRepository.findByUserEmail(email);
@@ -254,7 +235,7 @@ public class GroupService {
 
         Set<String> uniqueMemberNames = new HashSet<>();
 
-        List<Group> groupsWithoutCreatorAndUniqueNames = groups.stream()
+        return groups.stream()
                 .map(group -> {
                     if (!group.getMembers().isEmpty()) {
                         List<Member> membersWithoutCreator = group.getMembers().stream()
@@ -267,8 +248,6 @@ public class GroupService {
                     }
                 })
                 .collect(Collectors.toList());
-
-        return ResponseEntity.ok(groupsWithoutCreatorAndUniqueNames);
 
     }
 

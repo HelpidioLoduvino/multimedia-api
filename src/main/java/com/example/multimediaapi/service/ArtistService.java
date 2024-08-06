@@ -10,7 +10,7 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class ArtistService {
-    private ArtistRepository artistRepository;
+    private final ArtistRepository artistRepository;
 
     public List<Artist> findAll() {
         return artistRepository.findAll();

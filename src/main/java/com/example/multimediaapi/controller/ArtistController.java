@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/artist")
+@RequestMapping("/api/artists")
 @AllArgsConstructor
 public class ArtistController {
-    private ArtistService artistService;
+    private final ArtistService artistService;
 
-    @GetMapping("/all")
+    @GetMapping
     public ResponseEntity<List<Artist>> getAll() {
         return ResponseEntity.ok(artistService.findAll());
     }

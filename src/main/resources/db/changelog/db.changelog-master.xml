@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog
-        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
-        <!-- <include file="db/changelog/001-drop-database.sql"/> -->
-        <!-- <include file="db/changelog/002-drop-table-playlist_content.sql"/> -->
-        <!-- <include file="db/changelog/003-drop-table-share_group.sql"/>-->
-        <!-- <include file="db/changelog/004-drop-table-album_review.sql"/> -->
-        <!-- <include file="/db/changelog/006-drop-table-accept-request-to-join-group.sql"/>
-        <include file="/db/changelog/007-drop-table-reject-request-to-join-group.sql"/>
-        <include file="/db/changelog/005-drop-table-request-to-join-group.sql"/> -->
+<!-- <include file="db/changelog/001-drop-database.sql"/> -->
+<!-- <include file="db/changelog/002-drop-table-playlist_content.sql"/> -->
+<!-- <include file="db/changelog/003-drop-table-share_group.sql"/>-->
+<!-- <include file="db/changelog/004-drop-table-album_review.sql"/> -->
+<!-- <include file="/db/changelog/006-drop-table-accept-request-to-join-group.sql"/>
+<include file="/db/changelog/007-drop-table-reject-request-to-join-group.sql"/>
+<include file="/db/changelog/005-drop-table-request-to-join-group.sql"/> -->
 </databaseChangeLog>

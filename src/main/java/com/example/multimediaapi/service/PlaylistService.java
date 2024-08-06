@@ -24,10 +24,10 @@ public class PlaylistService {
     private final UserRepository userRepository;
     private final ContentRepository contentRepository;
 
-    public ResponseEntity<Playlist> addPlaylist(Playlist playList, List<Long> contentIds){
+    public Playlist addPlaylist(Playlist playList, List<Long> contentIds){
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
+            if (auth == null) { return null;}
             Object principal = auth.getPrincipal();
             String email = ((UserDetails) principal).getUsername();
 
@@ -47,10 +47,10 @@ public class PlaylistService {
 
             playListRepository.save(playList);
 
-            return ResponseEntity.ok().build();
+            return playList;
 
         }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            throw new RuntimeException("Erro ao criar playlist: " + e.getMessage(), e);
         }
     }
 
@@ -61,24 +61,24 @@ public class PlaylistService {
     public List<Playlist> getAllPlaylists(){
         return playListRepository.findAll();
     }
-    public ResponseEntity<List<Playlist>> getAllPlaylistsByUserId() {
+    public List<Playlist> getAllPlaylistsByUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
+        if (auth == null) { return null;}
         Object principal = auth.getPrincipal();
         String email = ((UserDetails) principal).getUsername();
         User user = userRepository.findByUserEmail(email);
         Long userId = user.getId();
-        return ResponseEntity.ok(playListRepository.findAllByUserId(userId));
+        return playListRepository.findAllByUserId(userId);
     }
 
-    public ResponseEntity<List<Playlist>> getAllPublicPlaylists(){
+    public List<Playlist> getAllPublicPlaylists(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) { return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
+        if (auth == null) { return null;}
         Object principal = auth.getPrincipal();
         String email = ((UserDetails) principal).getUsername();
         User user = userRepository.findByUserEmail(email);
         Long userId = user.getId();
-        return ResponseEntity.ok(playListRepository.findAllPublicPlaylistsWithDifferentUserId(userId));
+        return playListRepository.findAllPublicPlaylistsWithDifferentUserId(userId);
     }
 
     public void addContentToPlaylist(Long contentId, List<Long> playlistIds){
