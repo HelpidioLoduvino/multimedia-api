@@ -29,7 +29,6 @@ public class AlbumService {
     private final UserService userService;
     private final MusicRepository musicRepository;
 
-
     public List<MusicRelease> getAllAlbums() {
         return musicReleaseRepository.findAllByReleaseType("Album");
     }
