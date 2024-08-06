@@ -28,8 +28,7 @@ public class VideoService {
     private final BandRepository bandRepository;
     private final GroupRepository groupRepository;
     private final VideoCompressionService videoCompressionService;
-    private static final String uploadVideoDir = "src/main/resources/static/video/";
-    private static final String compressedVideoDir = "src/main/resources/static/video/";
+    private final UploadPath uploadPath;
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -45,9 +44,9 @@ public class VideoService {
             saveVideoFile(videoFile, videoFileName);
 
             String compressedVideoFileName = "compressed_" + videoFileName;
-            File compressedFile = videoCompressionService.compressVideo(new File(uploadVideoDir + videoFileName), compressedVideoDir + compressedVideoFileName);
+            File compressedFile = videoCompressionService.compressVideo(new File(uploadPath.getVideoUploadDir() + videoFileName), uploadPath.getVideoUploadDir() + compressedVideoFileName);
 
-            File originalFile = new File(uploadVideoDir + videoFileName);
+            File originalFile = new File(uploadPath.getVideoUploadDir() + videoFileName);
             if (originalFile.exists()) {
                 originalFile.delete();
             }
@@ -99,7 +98,7 @@ public class VideoService {
             newVideo.setTitle(video.getTitle());
             newVideo.setDescription(video.getDescription());
             //newVideo.setPath(uploadVideoDir + videoFileName);
-            newVideo.setPath(compressedVideoDir + compressedVideoFileName);
+            newVideo.setPath(uploadPath.getVideoUploadDir() + compressedVideoFileName);
             newVideo.setUser(user);
             newVideo.setAuthor(author);
             newVideo.setMimetype(videoFile.getContentType());
@@ -128,12 +127,12 @@ public class VideoService {
 
     private void saveVideoFile(MultipartFile file, String fileName) throws IOException {
 
-        File directory = new File(uploadVideoDir);
+        File directory = new File(uploadPath.getVideoUploadDir());
         if (!directory.exists()) {
             directory.mkdirs();
         }
 
-        Path filePath = Paths.get(uploadVideoDir + fileName);
+        Path filePath = Paths.get(uploadPath.getVideoUploadDir() + fileName);
         Files.write(filePath, file.getBytes());
     }
 

@@ -9,9 +9,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,8 +25,6 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class MusicService {
 
-    private static final String uploadDir = "src/main/resources/static/music/";
-    private static final String uploadImgDir = "src/main/resources/static/cover/";
     private final UserRepository userRepository;
     private final UserService userService;
     private final MusicRepository musicRepository;
@@ -42,6 +37,7 @@ public class MusicService {
     private final BandRepository bandRepository;
     private final FeatureRepository featureRepository;
     private final ContentRepository contentRepository;
+    private final UploadPath uploadPath;
 
     @Transactional(rollbackFor = Exception.class)
     public Music uploadMusic(Music music, String group, MultipartFile musicFile, MultipartFile imageFile) {
@@ -71,7 +67,7 @@ public class MusicService {
                         newRelease.setMusicReleaseDescription(music.getMusicRelease().getMusicReleaseDescription());
                         newRelease.setReleaseType(music.getMusicRelease().getReleaseType());
                         newRelease.setReleaseDate(music.getMusicRelease().getReleaseDate());
-                        newRelease.setCover(uploadImgDir + imageFileName);
+                        newRelease.setCover(uploadPath.getImageUploadDir() + imageFileName);
                         newRelease = musicReleaseRepository.save(newRelease);
                         return newRelease;
                     });
@@ -133,7 +129,7 @@ public class MusicService {
 
             Music newMusic = new Music();
             newMusic.setTitle(music.getTitle());
-            newMusic.setPath(uploadDir + musicFileName);
+            newMusic.setPath(uploadPath.getMusicUploadDir() + musicFileName);
             newMusic.setUser(user);
             newMusic.setGenre(genre);
             newMusic.setMusicRelease(musicRelease);
@@ -176,23 +172,23 @@ public class MusicService {
 
     private void saveMusicFile(MultipartFile file, String fileName) throws IOException {
 
-        File directory = new File(uploadDir);
+        File directory = new File(uploadPath.getMusicUploadDir());
         if (!directory.exists()) {
             directory.mkdirs();
         }
 
-        Path filePath = Paths.get(uploadDir + fileName);
+        Path filePath = Paths.get(uploadPath.getMusicUploadDir() + fileName);
         Files.write(filePath, file.getBytes());
     }
 
     private void saveImgFile(MultipartFile file, String fileName) throws IOException {
 
-        File directory = new File(uploadImgDir);
+        File directory = new File(uploadPath.getImageUploadDir());
         if (!directory.exists()) {
             directory.mkdirs();
         }
 
-        Path filePath = Paths.get(uploadImgDir + fileName);
+        Path filePath = Paths.get(uploadPath.getImageUploadDir() + fileName);
         Files.write(filePath, file.getBytes());
     }
 
