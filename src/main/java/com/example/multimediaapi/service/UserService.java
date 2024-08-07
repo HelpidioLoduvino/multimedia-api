@@ -6,6 +6,7 @@ import com.example.multimediaapi.repository.UserRepository;
 import com.example.multimediaapi.security.TokenService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -33,7 +35,7 @@ public class UserService implements UserDetailsService {
         return userRepository.findByEmail(email);
     }
 
-    public User registerUser(User user) {
+    public User register(User user) {
         try {
             if (this.userRepository.findByEmail(user.getEmail()) != null) {
                 throw new IllegalArgumentException("O usuário já está registrado.");
@@ -78,8 +80,8 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public List<UserDto> getAllUsers() {
-        return userRepository.findAllUsers();
+    public Page<User> getAll(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
     public void deleteUser(Long id) {

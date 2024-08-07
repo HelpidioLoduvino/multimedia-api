@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,8 +22,8 @@ public class ContentController {
     private final ContentService contentService;
 
     @GetMapping
-    public ResponseEntity<List<Content>> getAll() {
-        return ResponseEntity.ok(contentService.getAllContents());
+    public ResponseEntity<List<Content>> getAll(Pageable pageable) {
+        return ResponseEntity.ok(contentService.getAllContents(pageable).getContent());
     }
 
     @GetMapping("/user")

@@ -4,6 +4,8 @@ import com.example.multimediaapi.model.*;
 import com.example.multimediaapi.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -66,8 +68,8 @@ public class GroupService {
         return groupRepository.findByNameOrMembersIsContainingOrMembersContaining("Público", member, owner);
     }
 
-    public List<Group> getAllGroups() {
-        return groupRepository.findAll();
+    public Page<Group> getAllGroups(Pageable pageable) {
+        return groupRepository.findAll(pageable);
     }
 
     public Group getAllUsersByGroupId(Long groupId) {

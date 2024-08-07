@@ -4,6 +4,8 @@ import com.example.multimediaapi.model.*;
 import com.example.multimediaapi.repository.*;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -158,8 +160,8 @@ public class MusicService {
         }
     }
 
-    public List<Music> getAll() {
-        return musicRepository.findAll();
+    public Page<Music> getAll(Pageable pageable) {
+        return musicRepository.findAll(pageable);
     }
 
     public void delete(Long id) {

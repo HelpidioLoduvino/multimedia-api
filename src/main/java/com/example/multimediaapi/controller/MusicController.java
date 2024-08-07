@@ -4,6 +4,7 @@ import com.example.multimediaapi.model.Music;
 import com.example.multimediaapi.service.MusicService;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,8 +24,8 @@ public class MusicController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Music>> getAll() {
-        return ResponseEntity.ok(musicService.getAll());
+    public ResponseEntity<List<Music>> getAll(Pageable pageable) {
+        return ResponseEntity.ok(musicService.getAll(pageable).getContent());
     }
 
     @GetMapping("/user")

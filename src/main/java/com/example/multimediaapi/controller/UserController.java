@@ -4,6 +4,8 @@ import com.example.multimediaapi.dto.*;
 import com.example.multimediaapi.model.User;
 import com.example.multimediaapi.service.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +20,7 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<User> register(@RequestBody User user) {
-        return ResponseEntity.ok(userService.registerUser(user));
+        return ResponseEntity.ok(userService.register(user));
     }
 
     @PostMapping("/login")
@@ -27,8 +29,8 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDto>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
+    public ResponseEntity<List<User>> findAll(Pageable pageable) {
+        return ResponseEntity.ok(userService.getAll(pageable).getContent());
     }
 
     @DeleteMapping

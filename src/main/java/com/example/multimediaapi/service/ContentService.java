@@ -12,6 +12,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 
@@ -30,8 +32,8 @@ public class ContentService {
     private final MusicRepository musicRepository;
     private final VideoRepository videoRepository;
 
-    public List<Content> getAllContents() {
-        return contentRepository.findAll();
+    public Page<Content> getAllContents(Pageable pageable) {
+        return contentRepository.findAll(pageable);
     }
 
     public List<Content> getAllContentsByUserId() {

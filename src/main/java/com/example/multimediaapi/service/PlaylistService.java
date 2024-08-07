@@ -6,6 +6,8 @@ import com.example.multimediaapi.repository.ContentRepository;
 import com.example.multimediaapi.repository.PlayListRepository;
 import com.example.multimediaapi.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -53,8 +55,8 @@ public class PlaylistService {
         return playListRepository.findById(playlistId).orElse(null);
     }
 
-    public List<Playlist> getAllPlaylists(){
-        return playListRepository.findAll();
+    public Page<Playlist> getAllPlaylists(Pageable pageable){
+        return playListRepository.findAll(pageable);
     }
     public List<Playlist> getAllPlaylistsByUserId() {
         String email = userService.getCurrentUser();

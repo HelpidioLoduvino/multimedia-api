@@ -3,6 +3,7 @@ package com.example.multimediaapi.controller;
 import com.example.multimediaapi.model.*;
 import com.example.multimediaapi.service.GroupService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,9 +46,9 @@ public class GroupController {
         return ResponseEntity.ok(groupService.getAllMyGroupsOrPublicGroups());
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<Object> getAll() {
-        return ResponseEntity.ok(groupService.getAllGroups());
+    @GetMapping
+    public ResponseEntity<List<Group>> getAll(Pageable pageable) {
+        return ResponseEntity.ok(groupService.getAllGroups(pageable).getContent());
     }
 
     @GetMapping("/users/{id}")

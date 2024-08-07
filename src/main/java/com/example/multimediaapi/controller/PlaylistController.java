@@ -4,6 +4,7 @@ import com.example.multimediaapi.dto.ContentPlaylistDto;
 import com.example.multimediaapi.model.Playlist;
 import com.example.multimediaapi.service.PlaylistService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,8 +27,8 @@ public class PlaylistController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Playlist>> getAllPlaylists(){
-        return ResponseEntity.ok(playlistService.getAllPlaylists());
+    public ResponseEntity<List<Playlist>> getAllPlaylists(Pageable pageable){
+        return ResponseEntity.ok(playlistService.getAllPlaylists(pageable).getContent());
     }
 
     @GetMapping("/user")
