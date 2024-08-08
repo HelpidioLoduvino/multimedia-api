@@ -1,5 +1,6 @@
 package com.example.multimediaapi.service;
 
+import com.example.multimediaapi.configuration.NotificationMessage;
 import com.example.multimediaapi.model.*;
 import com.example.multimediaapi.repository.*;
 import jakarta.transaction.Transactional;
@@ -23,6 +24,7 @@ public class GroupService {
     private final ContentRepository contentRepository;
     private final RequestToJoinGroupRepository requestToJoinGroupRepository;
     private final NotificationRepository notificationRepository;
+    private final NotificationMessage notificationMessage;
 
     public Group createGroup(Group myGroup) {
 
@@ -104,7 +106,7 @@ public class GroupService {
         notification.setMyGroup(myGroup);
         notification.setOpened(false);
         notification.setRecipient(null);
-        notification.setMessage("Deseja fazer parte do grupo");
+        notification.setMessage(notificationMessage.getMessage());
 
         notificationRepository.save(notification);
 
