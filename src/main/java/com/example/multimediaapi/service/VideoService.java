@@ -1,5 +1,6 @@
 package com.example.multimediaapi.service;
 
+import com.example.multimediaapi.configuration.UploadPath;
 import com.example.multimediaapi.model.*;
 import com.example.multimediaapi.repository.*;
 import lombok.AllArgsConstructor;

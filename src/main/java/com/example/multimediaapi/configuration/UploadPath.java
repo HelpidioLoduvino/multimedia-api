@@ -1,4 +1,4 @@
-package com.example.multimediaapi.service;
+package com.example.multimediaapi.configuration;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
